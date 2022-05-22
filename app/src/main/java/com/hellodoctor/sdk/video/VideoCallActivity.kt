@@ -12,40 +12,41 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.hellodoctor.sdk.ui.theme.HelloDoctorSDKTheme
 
-class HDVideoCallActivity : ComponentActivity() {
+class VideoCallActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            HDVideoCallScreen()
+            VideoCallScreen()
         }
     }
 }
 
 @Composable
-fun HDVideoCallScreen() {
-    var hdVideo: HDVideo? by remember {
+fun VideoCallScreen() {
+    var videoCallController: VideoCallController? by remember {
         mutableStateOf(null)
     }
 
     HelloDoctorSDKTheme {
-        HDVideoPermissions(
+        VideoCallPermissions(
             content = {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Black,
                 ) {
-                    AndroidView(factory = { context -> HDVideoLocalView(context).apply {
-                        hdVideo = HDVideo.getInstance(context, context.getActivity())
-                        hdVideo?.setLocalView(this)
-                        hdVideo?.prepareLocalMedia()
+                    AndroidView(factory = { context -> LocalParticipantView(context).apply {
+                        videoCallController = VideoCallController(context)
+                        videoCallController?.setLocalParticipantView(this)
+                        videoCallController?.startLocalCapture()
                     }})
                     Column(verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(2.dp)) {
-                        HDVideoCallControlsComponent(hdVideo)
+                        ActiveVideoCallControls(videoCallController)
                     }
                 }
             }
@@ -55,6 +56,6 @@ fun HDVideoCallScreen() {
 
 @Preview(showBackground = true)
 @Composable
-fun HDVideoCallScreenPreview() {
-    HDVideoCallScreen()
+fun VideoCallScreenPreview() {
+    VideoCallScreen()
 }

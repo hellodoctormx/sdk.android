@@ -37,14 +37,14 @@ fun Context.getActivity(): AppCompatActivity? = when (this) {
 
 @Preview(showBackground = true)
 @Composable
-fun HDVideoCallControlsPreview() {
+fun ActiveVideoCallControlsPreview() {
     val currentContext = LocalContext.current
-    val hdVideo = HDVideo.getInstance(currentContext, currentContext.getActivity())
-    HDVideoCallControlsComponent(hdVideo)
+    val hdVideo = VideoCallController(currentContext)
+    ActiveVideoCallControls(hdVideo)
 }
 
 @Composable
-fun HDVideoCallControlsComponent(hdVideo: HDVideo?) {
+fun ActiveVideoCallControls(hdVideo: VideoCallController?) {
     HelloDoctorSDKTheme {
         Surface(
             shape = CircleShape,
@@ -62,7 +62,23 @@ fun HDVideoCallControlsComponent(hdVideo: HDVideo?) {
 }
 
 @Composable
-fun EndCallControl(hdVideo: HDVideo?) {
+fun IncomingVideoCallControls(videoCallController: VideoCallController?) {
+    HelloDoctorSDKTheme {
+        Surface(
+            shape = CircleShape,
+            modifier = Modifier.padding(12.dp),
+            color = Gray900
+        ) {
+            Row {
+                EndCallControl(videoCallController)
+                StartCallControl(videoCallController)
+            }
+        }
+    }
+}
+
+@Composable
+fun StartCallControl(videoCallController: VideoCallController?) {
     var isConnected by remember {
         mutableStateOf(true)
     }
@@ -73,11 +89,7 @@ fun EndCallControl(hdVideo: HDVideo?) {
         background = if (isConnected) Red500 else Green200,
         controlDescription = "endCall",
         onClick = {
-            if (isConnected) {
-                hdVideo?.stopLocalCapture()
-            } else {
-                hdVideo?.startLocalCapture()
-            }
+            videoCallController?.disconnect()
 
             isConnected = !isConnected
         }
@@ -85,7 +97,26 @@ fun EndCallControl(hdVideo: HDVideo?) {
 }
 
 @Composable
-fun ToggleVideoStateControl(hdVideo: HDVideo?) {
+fun EndCallControl(hdVideo: VideoCallController?) {
+    var isConnected by remember {
+        mutableStateOf(true)
+    }
+
+    ActiveCallControl(
+        iconResource = R.drawable.ic_phone_solid,
+        iconRotateDegrees = 135f,
+        background = if (isConnected) Red500 else Green200,
+        controlDescription = "endCall",
+        onClick = {
+            hdVideo?.disconnect()
+
+            isConnected = !isConnected
+        }
+    )
+}
+
+@Composable
+fun ToggleVideoStateControl(hdVideo: VideoCallController?) {
     var isVideoEnabled by remember {
         mutableStateOf(true)
     }
@@ -96,14 +127,14 @@ fun ToggleVideoStateControl(hdVideo: HDVideo?) {
         iconResource = videoStateIcon,
         controlDescription = "toggleVideo",
         onClick = {
-            hdVideo?.setVideoEnabled(!isVideoEnabled)
+            hdVideo?.localVideoController?.setVideoEnabled(!isVideoEnabled)
             isVideoEnabled = !isVideoEnabled
         }
     )
 }
 
 @Composable
-fun ToggleAudioStateControl(hdVideo: HDVideo?) {
+fun ToggleAudioStateControl(hdVideo: VideoCallController?) {
     var isAudioEnabled by remember {
         mutableStateOf(true)
     }
@@ -114,14 +145,14 @@ fun ToggleAudioStateControl(hdVideo: HDVideo?) {
         iconResource = audioStateIcon,
         controlDescription = "toggleAudio",
         onClick = {
-            hdVideo?.setAudioEnabled(!isAudioEnabled)
+            hdVideo?.localAudioController?.setAudioEnabled(!isAudioEnabled)
             isAudioEnabled = !isAudioEnabled
         }
     )
 }
 
 @Composable
-fun ToggleCameraStateControl(hdVideo: HDVideo?) {
+fun ToggleCameraStateControl(hdVideo: VideoCallController?) {
     var selectedCamera by remember {
         mutableStateOf("front")
     }
@@ -131,7 +162,7 @@ fun ToggleCameraStateControl(hdVideo: HDVideo?) {
         iconRotateDegrees = if (selectedCamera == "front") 0f else 90f,
         controlDescription = "toggleAudio",
         onClick = {
-            hdVideo?.flipCamera()
+            hdVideo?.cameraController?.switchCamera()
             selectedCamera = if (selectedCamera == "front") "back" else "front"
         }
     )

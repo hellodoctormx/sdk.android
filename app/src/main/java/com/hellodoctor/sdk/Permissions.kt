@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import com.google.accompanist.permissions.*
 
 @Composable
-fun HDVideoPermissions(
+fun VideoCallPermissions(
     permissions: List<String> = listOf(android.Manifest.permission.RECORD_AUDIO),
     rationale: String = "This permission is important for this app. Please grant the permission.",
     permissionNotAvailableContent: @Composable () -> Unit = { },
