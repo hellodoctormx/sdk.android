@@ -1,0 +1,46 @@
+package com.hellodoctormx.examples.foodpass
+
+import android.util.Log
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
+
+class FPFirebaseMessagingService: FirebaseMessagingService() {
+    private val tag = "FPFirebaseMessagingService"
+
+    override fun onNewToken(token: String) {
+        Log.d(tag, "Refreshed token: $token")
+    }
+
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        if (remoteMessage.data.isNotEmpty()) {
+            Log.d(tag, "Message data payload: ${remoteMessage.data}")
+            when (remoteMessage.data["type"]) {
+                "incomingVideoCall" -> displayIncomingCallNotification(this)
+            }
+        }
+    }
+
+    companion object {
+        fun registerFirebaseMessagingToken() {
+            Firebase.auth.currentUser?.let { currentUser ->
+                FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        Log.w("FPFirebaseMessagingService", "Fetching FCM registration token failed", task.exception)
+                        return@OnCompleteListener
+                    }
+
+                    val token = task.result
+
+                    Firebase.firestore
+                        .document("users/${currentUser.uid}")
+                        .update(mapOf("thirdPartyDeviceToken" to token))
+                })
+            }
+        }
+    }
+}

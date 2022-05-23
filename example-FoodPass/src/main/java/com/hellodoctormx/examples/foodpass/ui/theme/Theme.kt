@@ -1,4 +1,4 @@
-package com.hellodoctormx.foodpass.ui.theme
+package com.hellodoctormx.examples.foodpass.ui.theme
 
 import android.app.Activity
 import android.os.Build

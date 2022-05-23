@@ -1,4 +1,4 @@
-package com.hellodoctormx.sdk.clients
+package com.hellodoctormx.sdk.api
 
 import android.content.Context
 import android.util.Log
@@ -13,7 +13,9 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
-abstract class AbstractServiceClient(
+const val LOCAL_PUBLIC_API_HOST = "http://192.168.100.26:3010"
+
+abstract class AbstractHelloDoctorAPI(
     val context: Context,
     val host: String? = defaultServiceHost
 ) {

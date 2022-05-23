@@ -1,4 +1,4 @@
-package com.hellodoctormx.foodpass
+package com.hellodoctormx.examples.foodpass
 
 import org.junit.Test
 

@@ -1,7 +1,7 @@
 package com.hellodoctormx.sdk.auth
 
 import android.content.Context
-import com.hellodoctormx.sdk.clients.UserServiceClient
+import com.hellodoctormx.sdk.api.UserServiceClient
 
 class HDCurrentUser {
     companion object {

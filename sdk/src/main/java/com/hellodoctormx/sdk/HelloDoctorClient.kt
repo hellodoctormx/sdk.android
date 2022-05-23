@@ -1,13 +1,10 @@
 package com.hellodoctormx.sdk
 
 import android.content.Context
+import com.hellodoctormx.sdk.api.AbstractHelloDoctorAPI
+import com.hellodoctormx.sdk.api.UserServiceClient
 import com.hellodoctormx.sdk.auth.HDCurrentUser
-import com.hellodoctormx.sdk.clients.AbstractServiceClient
-import com.hellodoctormx.sdk.clients.LOCAL_USER_SERVICE_HOST
-import com.hellodoctormx.sdk.clients.UserServiceClient
-import com.hellodoctormx.sdk.clients.VideoServiceClient
 import com.hellodoctormx.sdk.types.Consultation
-import com.hellodoctormx.sdk.video.VideoCallController
 import kotlinx.coroutines.runBlocking
 
 class HelloDoctorClient(private val context: Context) {
@@ -21,11 +18,11 @@ class HelloDoctorClient(private val context: Context) {
         HDCurrentUser.signOut()
     }
 
-    fun createUser(thirdPartyUserID: String, email: String, phoneNumber: String?): String {
+    fun createUser(email: String): String {
         var response: UserServiceClient.CreateUserResponse
 
         runBlocking {
-            response = userServiceClient.createUser(thirdPartyUserID, email, phoneNumber)
+            response = userServiceClient.createUser(email)
         }
 
         return response.uid
@@ -46,40 +43,13 @@ class HelloDoctorClient(private val context: Context) {
         IncomingVideoCall.callerDisplayName = callerDisplayName
     }
 
-    fun answerIncomingVideoCall() {
-        val incomingVideoCallRoomSID = IncomingVideoCall.videoRoomSID
-            ?: throw Error("no incoming video call")
-
-        var videoCallAccessToken: String? = null
-
-        runBlocking {
-            with (VideoServiceClient(context)) {
-                val videoCallAccessResponse = this.requestVideoCallAccess(incomingVideoCallRoomSID)
-                videoCallAccessToken = videoCallAccessResponse.accessToken
-            }
-        }
-
-        val videoCallController = VideoCallController.getInstance(context)
-        videoCallController.connect(incomingVideoCallRoomSID, videoCallAccessToken!!)
-    }
-
-    fun rejectIncomingVideoCall() {
-        val incomingVideoCallRoomSID = IncomingVideoCall.videoRoomSID
-            ?: throw Error("no incoming video call")
-
-        runBlocking{
-            val videoServiceClient = VideoServiceClient(context)
-            videoServiceClient.rejectVideoCall(incomingVideoCallRoomSID)
-        }
-    }
-
     companion object {
         var apiKey: String? = null
         var serviceHost: String? = null
 
         fun configure(apiKey: String, serviceHost: String) {
-            AbstractServiceClient.apiKey = apiKey
-            AbstractServiceClient.defaultServiceHost = serviceHost
+            AbstractHelloDoctorAPI.apiKey = apiKey
+            AbstractHelloDoctorAPI.defaultServiceHost = serviceHost
         }
     }
 

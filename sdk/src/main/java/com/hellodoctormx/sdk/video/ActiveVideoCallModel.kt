@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hellodoctormx.sdk.HelloDoctorClient
-import com.hellodoctormx.sdk.clients.VideoServiceClient
+import com.hellodoctormx.sdk.api.VideoServiceClient
 import kotlinx.coroutines.launch
 
 class ActiveVideoCallModel : ViewModel() {
