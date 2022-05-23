@@ -61,14 +61,6 @@ class VideoCallController(val context: Context) {
         activeRoom = null
     }
 
-    fun registerEventHandler(eventName: String, handler: VideoCallEventHandler) {
-        if (allEventHandlers[eventName] == null) {
-            allEventHandlers[eventName] = mutableListOf()
-        }
-
-        allEventHandlers[eventName]?.add(handler)
-    }
-
     fun isConnectedToRoom(roomName: String): Boolean {
         return activeRoom?.room?.name == roomName
     }
@@ -79,10 +71,6 @@ class VideoCallController(val context: Context) {
 
     fun startLocalCapture() {
         localVideoController.startLocalCapture()
-    }
-
-    fun getRemoteParticipants(): List<RemoteParticipant> {
-        return activeRoom?.room?.remoteParticipants ?: emptyList()
     }
 
     fun renderRemoteParticipant(remoteView: VideoView, remoteParticipantIdentity: String) {
@@ -96,6 +84,7 @@ class VideoCallController(val context: Context) {
             if (!remoteVideoTrackPublication.isTrackSubscribed) {
                 continue
             }
+
 
             val remoteVideoTrack = remoteVideoTrackPublication.remoteVideoTrack ?: continue
             remoteVideoTrack.addSink(remoteView)

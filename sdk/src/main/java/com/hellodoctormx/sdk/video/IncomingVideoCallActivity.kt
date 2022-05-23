@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
@@ -18,11 +17,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.app.NotificationManagerCompat
 import com.hellodoctormx.sdk.HelloDoctorClient
 import com.hellodoctormx.sdk.ui.theme.Blue700
 import com.hellodoctormx.sdk.ui.theme.HelloDoctorSDKTheme
 
 const val INCOMING_VIDEO_CALL_ACTION = "com.hellodoctormx.sdk.action.INCOMING_VIDEO_CALL"
+const val INCOMING_VIDEO_CALL_NOTIFICATION_ID = 42
 const val INCOMING_VIDEO_CALL_STATE = "com.hellodoctormx.sdk.video.INCOMING_VIDEO_CALL_STATE"
 const val VIDEO_ROOM_SID = "com.hellodoctormx.sdk.video.VIDEO_ROOM_SID"
 const val CALLER_DISPLAY_NAME = "com.hellodoctormx.sdk.video.CALLER_DISPLAY_NAME"
@@ -35,6 +36,13 @@ class IncomingVideoCallActivity : ComponentActivity() {
         HelloDoctorClient.IncomingVideoCall.videoRoomSID = videoRoomSID
 
         val activeVideoCallModel = ActiveVideoCallModel()
+
+        VideoCallController.getInstance(this).apply {
+            localAudioController.setRingtonePlaying(false)
+        }
+
+        val notificationManager = NotificationManagerCompat.from(this)
+        notificationManager.cancel(INCOMING_VIDEO_CALL_NOTIFICATION_ID)
 
         setContent {
             HelloDoctorSDKTheme {

@@ -3,15 +3,14 @@ package com.hellodoctormx.sdk.clients
 import android.content.Context
 import android.util.Log
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.hellodoctormx.sdk.auth.HDCurrentUser
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.json.JSONException
 import org.json.JSONObject
 
 abstract class AbstractServiceClient(
@@ -41,24 +40,18 @@ abstract class AbstractServiceClient(
 
         val jsonPostData = if (data == null) JSONObject() else JSONObject(data as Map<Any, Any>)
 
-        Log.i("AbstractServiceClient:DOING_REQUEST","[$url]")
         val jsonObjectRequest = object : JsonObjectRequest(
             method,
             url,
             jsonPostData,
-            Response.Listener { response -> // response listener
-                Log.i("AbstractServiceClient:GOT_RESPONSE","[$response]")
-                try {
-                    val obj: JSONObject = response
-                    runBlocking {
-                        responseChannel.send(obj.toString())
-                    }
-
-                }catch (e: JSONException){
-                    Log.w("AbstractServiceClient:JSONException","[doRequest:$method:$url:ERROR] ${e.message}")
+            {
+                runBlocking(Dispatchers.IO) {
+                    responseChannel.send(it.toString())
                 }
+
+                responseChannel.close()
             },
-            Response.ErrorListener {
+            {
                 Log.w("AbstractServiceClient","[doRequest:$method:$url:ERROR] ${it.message}")
                 throw it
             }
