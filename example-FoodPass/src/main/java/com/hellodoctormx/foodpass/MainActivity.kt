@@ -44,7 +44,7 @@ class HomeScreenViewModel : ViewModel() {
     fun doSignIn(context: Context) {
         viewModelScope.launch {
             val client = HelloDoctorClient(context)
-            client.signIn("RXu1V5OsFDRkvYKMuG2QdojI3273", HELLO_DOCTOR_TEST_TOKEN)
+            client.signIn("ZUXfYyKlEUbFV1qTy9GpyYbL04q1", HELLO_DOCTOR_TEST_TOKEN)
         }
     }
 }
@@ -62,8 +62,8 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
             onClick = {
                 val intent = Intent(context, IncomingVideoCallActivity::class.java).apply {
                     action = "com.hellodoctor.sdk.action.INCOMING_VIDEO_CALL"
-                    putExtra(INCOMING_VIDEO_CALL_STATE, "incoming")
-                    putExtra(VIDEO_ROOM_SID, "RM002e024f59d841919e0e213c0b52efc0")
+                    putExtra(INCOMING_VIDEO_CALL_STATE, "answered")
+                    putExtra(VIDEO_ROOM_SID, "RMb81ada7840f1a0d3ab592784dc35f46e")
                     putExtra(CALLER_DISPLAY_NAME, "Daniel Doctor")
                 }
 

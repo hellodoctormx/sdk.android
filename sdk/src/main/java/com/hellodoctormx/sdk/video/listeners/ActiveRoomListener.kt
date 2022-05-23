@@ -11,7 +11,7 @@ class ActiveRoomListener internal constructor(private val videoCallController: V
     override fun onConnected(room: Room) {
         Log.d(TAG, "Connected to " + room.name)
 
-        videoCallController.localAudioController.setSpeakerPhone(true)
+        videoCallController.localAudioController.setSpeakerphoneEnabled(true)
 
         val remoteParticipantIDs = ArrayList<String>()
         for (remoteParticipant in room.remoteParticipants) {

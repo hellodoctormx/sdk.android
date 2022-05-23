@@ -70,12 +70,13 @@ class RemoteParticipantListener internal constructor(private val videoCallContro
         remoteVideoTrack: RemoteVideoTrack
     ) {
         Log.d(tag, "Subscribed video track for " + participant.identity)
+
         val args = Bundle()
         args.putString("action", "connected")
         args.putString("participantIdentity", participant.identity)
         videoCallController.sendEvent("participantVideoEvent", args)
-        val remoteParticipantView: VideoView? =
-            videoCallController.remoteParticipantViews[participant.identity]
+
+        val remoteParticipantView = videoCallController.remoteParticipantView
         if (remoteParticipantView != null) {
             videoCallController.renderRemoteParticipant(remoteParticipantView, participant.identity)
         }
@@ -98,11 +99,12 @@ class RemoteParticipantListener internal constructor(private val videoCallContro
         remoteVideoTrack: RemoteVideoTrack
     ) {
         Log.d(tag, "Unsubscribed video track for " + remoteParticipant.identity)
-        val participantVideoView: RemoteParticipantView? =
-            videoCallController.remoteParticipantViews[remoteParticipant.identity]
+
+        val participantVideoView = videoCallController.remoteParticipantView
         if (participantVideoView != null) {
             remoteVideoTrack.removeSink(participantVideoView)
         }
+
         val args = Bundle()
         args.putString("action", "disconnected")
         args.putString("participantIdentity", remoteParticipant.identity)

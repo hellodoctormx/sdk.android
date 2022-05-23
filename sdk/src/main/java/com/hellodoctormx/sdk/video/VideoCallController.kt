@@ -24,7 +24,7 @@ class VideoCallController(val context: Context) {
     val localVideoController = LocalVideoController(context, cameraController)
     val localAudioController = LocalAudioController(context)
 
-    val remoteParticipantViews = emptyMap<String, RemoteParticipantView>()
+    var remoteParticipantView: RemoteParticipantView? = null
 
     private val allEventHandlers = mutableMapOf<String, MutableList<VideoCallEventHandler>>()
 
@@ -98,16 +98,13 @@ class VideoCallController(val context: Context) {
             }
 
             val remoteVideoTrack = remoteVideoTrackPublication.remoteVideoTrack ?: continue
+            remoteVideoTrack.addSink(remoteView)
 
-            context.getActivity()?.runOnUiThread {
-                remoteVideoTrack.addSink(remoteView)
+            val data = Bundle()
+            data.putString("action", "renderedParticipant");
+            data.putString("participantIdentity", remoteParticipant.identity);
 
-                val data = Bundle()
-                data.putString("action", "renderedParticipant");
-                data.putString("participantIdentity", remoteParticipant.identity);
-
-                sendEvent("participantVideoEvent", data);
-            }
+            sendEvent("participantVideoEvent", data);
         }
     }
 
@@ -172,7 +169,9 @@ class LocalVideoController(val context: Context, private val cameraController: C
             localVideoTrack.removeSink(sink)
         }
 
-        localParticipantView?.let { localVideoTrack.addSink(it) }
+        localParticipantView?.let {
+            localVideoTrack.addSink(it)
+        }
 
         return localVideoTrack
     }
@@ -187,7 +186,7 @@ class LocalVideoController(val context: Context, private val cameraController: C
         localParticipantView = null
     }
 
-    fun setVideoEnabled(enabled: Boolean) {
+    fun setCapturerEnabled(enabled: Boolean) {
         localVideoTrack?.enabled = enabled
     }
 }
@@ -227,13 +226,13 @@ class LocalAudioController(val context: Context) {
         if (shouldPlayRingtone) ringtone.play() else ringtone.stop()
     }
 
-    fun setAudioEnabled(enabled: Boolean) {
+    fun setMicrophoneEnabled(enabled: Boolean) {
         localAudioTrack?.enabled = enabled
     }
 
-    fun setSpeakerPhone(value: Boolean) {
+    fun setSpeakerphoneEnabled(enabled: Boolean) {
         setAudioFocus()
-        audioManager.isSpeakerphoneOn = value
+        audioManager.isSpeakerphoneOn = enabled
     }
 
     private fun setAudioFocus() {

@@ -22,16 +22,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.hellodoctormx.sdk.HelloDoctorClient
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import com.hellodoctormx.sdk.R
-import com.hellodoctormx.sdk.clients.VideoServiceClient
 import com.hellodoctormx.sdk.ui.theme.Gray500
 import com.hellodoctormx.sdk.ui.theme.Gray900
 import com.hellodoctormx.sdk.ui.theme.Green200
 import com.hellodoctormx.sdk.ui.theme.Red500
 import com.hellodoctormx.sdk.video.ui.theme.HelloDoctorSDKTheme
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 fun Context.getActivity(): AppCompatActivity? = when (this) {
     is AppCompatActivity -> this
@@ -39,16 +37,35 @@ fun Context.getActivity(): AppCompatActivity? = when (this) {
     else -> null
 }
 
+@Composable
+fun LocalParticipantAndroidView() {
+    AndroidView(factory = { context ->
+        LocalParticipantView(context).apply {
+            val videoCallController = VideoCallController.getInstance(context)
+            videoCallController.setLocalParticipantView(this)
+            videoCallController.startLocalCapture()
+        }
+    }, modifier = Modifier.zIndex(0f))
+}
+
+@Composable
+fun RemoteParticipantAndroidView() {
+    AndroidView(factory = { context ->
+        RemoteParticipantView(context).apply {
+            val videoCallController = VideoCallController.getInstance(context)
+            videoCallController.remoteParticipantView = this
+        }
+    }, modifier = Modifier.zIndex(0f))
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ActiveVideoCallControlsPreview() {
-    val currentContext = LocalContext.current
-    val hdVideo = VideoCallController(currentContext)
-    ActiveVideoCallControls(hdVideo)
+    ActiveVideoCallControls(ActiveVideoCallModel())
 }
 
 @Composable
-fun ActiveVideoCallControls(hdVideo: VideoCallController?) {
+fun ActiveVideoCallControls(activeVideoCallModel: ActiveVideoCallModel) {
     HelloDoctorSDKTheme {
         Surface(
             shape = CircleShape,
@@ -56,17 +73,17 @@ fun ActiveVideoCallControls(hdVideo: VideoCallController?) {
             color = Gray900
         ) {
             Row {
-                EndCallControl(hdVideo)
-                ToggleVideoStateControl(hdVideo)
-                ToggleAudioStateControl(hdVideo)
-                ToggleCameraStateControl(hdVideo)
+                EndCallControl(activeVideoCallModel)
+                ToggleCameraEnabledButton(activeVideoCallModel)
+                ToggleMicrophoneEnabledButton(activeVideoCallModel)
+                ToggleCameraButton(activeVideoCallModel)
             }
         }
     }
 }
 
 @Composable
-fun IncomingVideoCallControls(videoCallController: VideoCallController?) {
+fun IncomingVideoCallControls(activeVideoCallModel: ActiveVideoCallModel) {
     HelloDoctorSDKTheme {
         Surface(
             shape = CircleShape,
@@ -74,120 +91,81 @@ fun IncomingVideoCallControls(videoCallController: VideoCallController?) {
             color = Gray900
         ) {
             Row {
-                EndCallControl(videoCallController)
-                StartCallControl(videoCallController)
+                EndCallControl(activeVideoCallModel)
+                StartCallControl(activeVideoCallModel)
             }
         }
     }
 }
 
 @Composable
-fun StartCallControl(videoCallController: VideoCallController?) {
-    val coroutineScope = rememberCoroutineScope()
+fun StartCallControl(activeVideoCallModel: ActiveVideoCallModel) {
+    val context = LocalContext.current
 
-    var isConnected by remember {
-        mutableStateOf(true)
-    }
-
-    val videoServiceClient = VideoServiceClient(LocalContext.current)
-    val videoRoomSID = HelloDoctorClient.IncomingVideoCall.videoRoomSID!!
-
-    val startCall: () -> Unit = {
-        runBlocking {
-            val videoAccessTokenResponse = videoServiceClient.requestVideoCallAccess(videoRoomSID)
-
-            videoCallController?.connect(
-                videoRoomSID = videoRoomSID,
-                accessToken = videoAccessTokenResponse.accessToken
-            )
-        }
-
-        isConnected = !isConnected
-    }
-
-    ActiveCallControl(
+    ActiveCallControlButton(
         iconResource = R.drawable.ic_phone_solid,
         iconRotateDegrees = 135f,
         background = Green200,
         controlDescription = "endCall",
-        onClick = { startCall() }
+        onClick = { activeVideoCallModel.doConnect(context) }
     )
 }
 
 @Composable
-fun EndCallControl(hdVideo: VideoCallController?) {
-    var isConnected by remember {
-        mutableStateOf(true)
-    }
+fun EndCallControl(activeVideoCallModel: ActiveVideoCallModel) {
+    val context = LocalContext.current
 
-    ActiveCallControl(
+    ActiveCallControlButton(
         iconResource = R.drawable.ic_phone_solid,
         iconRotateDegrees = 135f,
         background = Red500,
         controlDescription = "endCall",
-        onClick = {
-            hdVideo?.disconnect()
-
-            isConnected = !isConnected
-        }
+        onClick = { activeVideoCallModel.doDisconnect(context) }
     )
 }
 
 @Composable
-fun ToggleVideoStateControl(hdVideo: VideoCallController?) {
-    var isVideoEnabled by remember {
-        mutableStateOf(true)
-    }
+fun ToggleCameraEnabledButton(activeVideoCallModel: ActiveVideoCallModel) {
+    val context = LocalContext.current
 
-    val videoStateIcon = if (isVideoEnabled) R.drawable.ic_video_solid else R.drawable.ic_video_slash_solid
-
-    ActiveCallControl(
-        iconResource = videoStateIcon,
+    ActiveCallControlButton(
+        iconResource = if (activeVideoCallModel.isCameraEnabled) R.drawable.ic_video_solid else R.drawable.ic_video_slash_solid,
         controlDescription = "toggleVideo",
         onClick = {
-            hdVideo?.localVideoController?.setVideoEnabled(!isVideoEnabled)
-            isVideoEnabled = !isVideoEnabled
+            activeVideoCallModel.toggleCameraEnabled(context)
         }
     )
 }
 
 @Composable
-fun ToggleAudioStateControl(hdVideo: VideoCallController?) {
-    var isAudioEnabled by remember {
-        mutableStateOf(true)
-    }
+fun ToggleMicrophoneEnabledButton(activeVideoCallModel: ActiveVideoCallModel) {
+    val context = LocalContext.current
 
-    val audioStateIcon = if (isAudioEnabled) R.drawable.ic_microphone_solid else R.drawable.ic_microphone_slash_solid
-
-    ActiveCallControl(
-        iconResource = audioStateIcon,
+    ActiveCallControlButton(
+        iconResource = if (activeVideoCallModel.isMicrophoneEnabled) R.drawable.ic_microphone_solid else R.drawable.ic_microphone_slash_solid,
         controlDescription = "toggleAudio",
         onClick = {
-            hdVideo?.localAudioController?.setAudioEnabled(!isAudioEnabled)
-            isAudioEnabled = !isAudioEnabled
+            activeVideoCallModel.toggleMicrophoneEnabled(context)
         }
     )
 }
 
 @Composable
-fun ToggleCameraStateControl(hdVideo: VideoCallController?) {
-    var selectedCamera by remember {
-        mutableStateOf("front")
-    }
+fun ToggleCameraButton(activeVideoCallModel: ActiveVideoCallModel) {
+    val context = LocalContext.current
 
-    ActiveCallControl(
+    ActiveCallControlButton(
         iconResource = R.drawable.ic_arrows_rotate_solid,
-        iconRotateDegrees = if (selectedCamera == "front") 0f else 90f,
+        iconRotateDegrees = if (activeVideoCallModel.activeCamera == "front") 0f else 90f,
         controlDescription = "toggleAudio",
         onClick = {
-            hdVideo?.cameraController?.switchCamera()
-            selectedCamera = if (selectedCamera == "front") "back" else "front"
+            activeVideoCallModel.toggleCamera(context)
         }
     )
 }
 
 @Composable
-fun ActiveCallControl(
+fun ActiveCallControlButton(
     iconResource: Int,
     iconRotateDegrees: Float = 0f,
     controlDescription: String,
