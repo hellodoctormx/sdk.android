@@ -1,7 +1,9 @@
 package com.hellodoctormx.sdk.video
 
+import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
+import com.hellodoctormx.sdk.HelloDoctorClient
 import com.hellodoctormx.sdk.R
 import com.hellodoctormx.sdk.ui.theme.Gray500
 import com.hellodoctormx.sdk.ui.theme.Gray900
@@ -45,7 +48,7 @@ fun LocalParticipantAndroidView() {
             videoCallController.setLocalParticipantView(this)
             videoCallController.startLocalCapture()
         }
-    }, modifier = Modifier.zIndex(0f))
+    })
 }
 
 @Composable

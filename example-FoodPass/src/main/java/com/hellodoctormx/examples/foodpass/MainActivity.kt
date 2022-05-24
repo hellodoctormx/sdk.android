@@ -9,13 +9,13 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.ViewModel
@@ -30,9 +30,8 @@ import com.hellodoctormx.sdk.HelloDoctorClient
 import com.hellodoctormx.sdk.video.*
 import kotlinx.coroutines.launch
 
-const val HELLO_DOCTOR_API_KEY = "Ax3JVY2pal5f8i6NwLNX3wjssyiR46u7itHypjZe"
+const val HELLO_DOCTOR_API_KEY = "NOT_A_KEY"
 const val HELLO_DOCTOR_TEST_TOKEN = "NOT_A_TOKEN"
-const val INCOMING_CALL_CHANNEL_ID = "incoming_call"
 
 class MainActivity : ComponentActivity() {
     private val tag = "FoodPass"
@@ -46,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
         auth = Firebase.auth
 
-        HelloDoctorClient.configure(HELLO_DOCTOR_API_KEY, "http://192.168.100.26:3009")
+        HelloDoctorClient.configure(HELLO_DOCTOR_API_KEY, "http://192.168.100.26:3010")
 
         val vm = HomeScreenViewModel()
 
@@ -60,6 +59,8 @@ class MainActivity : ComponentActivity() {
 
         if (auth.currentUser == null){
             authenticateTestUser()
+        } else {
+            registerFirebaseMessagingToken()
         }
     }
 
@@ -111,46 +112,67 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
     }
 
     FoodPassTheme {
-        Button(
-            onClick = { displayIncomingCallNotification(context) }
-        ) {
-            Text("test")
-        }
+        Text("FoodPass")
     }
 }
 
-fun displayIncomingCallNotification(context: Context) {
-    VideoCallController.getInstance(context).apply {
-        localAudioController.setRingtonePlaying(true)
-    }
+fun displayIncomingCallNotification(context: Context, videoRoomSID: String, callerDisplayName: String) {
+    val client = HelloDoctorClient(context)
+    client.registerIncomingVideoCall(videoRoomSID, callerDisplayName = callerDisplayName)
 
-    val answerCallIntent = Intent(context, IncomingVideoCallActivity::class.java).apply {
-        action = INCOMING_VIDEO_CALL_ACTION
+    val answerCallIntent = Intent(context, FPIncomingVideoCallActivity::class.java).apply {
+        action = Actions.INCOMING_VIDEO_CALL_ANSWERED.action
         putExtra(INCOMING_VIDEO_CALL_STATE, "answered")
-        putExtra(VIDEO_ROOM_SID, "RMb81ada7840f1a0d3ab592784dc35f46e")
-        putExtra(CALLER_DISPLAY_NAME, "Daniel Doctor")
+        putExtra(VIDEO_ROOM_SID, videoRoomSID)
+        putExtra(CALLER_DISPLAY_NAME, callerDisplayName)
     }
 
     val answerCallPendingIntent = PendingIntent.getActivity(context, 0, answerCallIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
     val answerCallAction = NotificationCompat.Action.Builder(
         IconCompat.createWithResource(context, com.hellodoctormx.sdk.R.drawable.ic_video_solid),
-        "Accept",
+        "Contestar",
         answerCallPendingIntent
     ).build()
 
+    val rejectCallIntent = Intent(context, FPIncomingVideoCallActivity::class.java).apply {
+        action = Actions.INCOMING_VIDEO_CALL_REJECTED.action
+        putExtra(INCOMING_VIDEO_CALL_STATE, "rejected")
+    }
+
+    val rejectCallPendingIntent = PendingIntent.getActivity(context, 0, rejectCallIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
+    val rejectCallAction = NotificationCompat.Action.Builder(
+        IconCompat.createWithResource(context, com.hellodoctormx.sdk.R.drawable.ic_video_solid),
+        "Colgar",
+        rejectCallPendingIntent
+    ).build()
+
+    val fullScreenIntent = Intent(context, FPIncomingVideoCallActivity::class.java).apply {
+        putExtra(VIDEO_ROOM_SID, videoRoomSID)
+        putExtra(CALLER_DISPLAY_NAME, callerDisplayName)
+    }
+
+    val fullScreenPendingIntent = PendingIntent.getActivity(context, 0, fullScreenIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+
     val notification = NotificationCompat
-        .Builder(context, INCOMING_CALL_CHANNEL_ID)
+        .Builder(context, context.getString(R.string.video_calls_default_channel_id))
         .setSmallIcon(com.hellodoctormx.sdk.R.drawable.ic_phone_solid)
-        .setContentTitle("Incoming call")
-        .setContentText("Dr. Daniel Sarfati")
+        .setContentTitle("$callerDisplayName de HelloDoctor")
+        .setContentText("Tu médico te está llamando para tu asesoría")
         .setOngoing(true)
+        .setVisibility(VISIBILITY_PUBLIC)
         .addAction(answerCallAction)
-        .setFullScreenIntent(answerCallPendingIntent, true)
+        .addAction(rejectCallAction)
+        .setFullScreenIntent(fullScreenPendingIntent, true)
         .build()
 
     val notificationManager = NotificationManagerCompat.from(context)
     notificationManager.notify(INCOMING_VIDEO_CALL_NOTIFICATION_ID, notification)
+
+    VideoCallController.getInstance(context).apply {
+        localAudioController.setRingtonePlaying(true)
+    }
 }
 
 @Preview(showBackground = true)

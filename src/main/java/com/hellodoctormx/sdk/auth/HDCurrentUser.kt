@@ -15,7 +15,7 @@ class HDCurrentUser {
             val response = userServiceClient.authenticateUser(userID, serverAuthToken)
 
             uid = userID
-            jwt = response.jwt
+            jwt = response.bearerToken
             refreshToken = response.refreshToken
         }
 

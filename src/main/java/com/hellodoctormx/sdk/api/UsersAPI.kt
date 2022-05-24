@@ -17,10 +17,10 @@ class UserServiceClient(
         )
     }
 
-    suspend fun authenticateUser(userID: String, serverAuthToken: String): AuthenticateUserResponse {
+    suspend fun authenticateUser(userID: String, refreshToken: String): AuthenticateUserResponse {
         return this.post(
             path = "/users/$userID/_authenticate",
-            postData = mutableMapOf("token" to serverAuthToken)
+            postData = mutableMapOf("refreshToken" to refreshToken)
         )
     }
 
@@ -34,7 +34,7 @@ class UserServiceClient(
     data class CreateUserResponse(val uid: String)
 
     @Serializable
-    data class AuthenticateUserResponse(val jwt: String, val refreshToken: String)
+    data class AuthenticateUserResponse(val bearerToken: String, val refreshToken: String)
 
     @Serializable
     data class GetUserConsultationsResponse(val consultations: List<Consultation>)

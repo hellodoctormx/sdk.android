@@ -1,5 +1,6 @@
 package com.hellodoctormx.sdk.video
 
+import android.app.Activity
 import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +12,7 @@ import com.hellodoctormx.sdk.api.VideoServiceClient
 import kotlinx.coroutines.launch
 
 class ActiveVideoCallModel : ViewModel() {
-    private var isConnected by mutableStateOf(false)
+    var isConnected by mutableStateOf(false)
     var isCameraEnabled by mutableStateOf(false)
     var isMicrophoneEnabled by mutableStateOf(true)
     var activeCamera by mutableStateOf("front")
@@ -38,6 +39,8 @@ class ActiveVideoCallModel : ViewModel() {
         videoCallController.disconnect()
 
         isConnected = false
+
+        (context as Activity).finish()
     }
 
     fun toggleCameraEnabled(context: Context) {

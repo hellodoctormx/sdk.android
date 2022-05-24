@@ -1,6 +1,7 @@
 package com.hellodoctormx.examples.foodpass
 
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -8,6 +9,8 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.hellodoctormx.sdk.video.INCOMING_VIDEO_CALL_NOTIFICATION_ID
+import com.hellodoctormx.sdk.video.VideoCallController
 
 class FPFirebaseMessagingService: FirebaseMessagingService() {
     private val tag = "FPFirebaseMessagingService"
@@ -20,7 +23,22 @@ class FPFirebaseMessagingService: FirebaseMessagingService() {
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(tag, "Message data payload: ${remoteMessage.data}")
             when (remoteMessage.data["type"]) {
-                "incomingVideoCall" -> displayIncomingCallNotification(this)
+                "incomingVideoCall" -> run {
+                    displayIncomingCallNotification(
+                        context = this,
+                        videoRoomSID = remoteMessage.data["videoRoomSID"]!!,
+                        callerDisplayName = remoteMessage.data["callerDisplayName"]!!
+                    )
+                }
+                "videoCallEnded" -> run {
+                    NotificationManagerCompat.from(this).apply {
+                        cancel(INCOMING_VIDEO_CALL_NOTIFICATION_ID)
+                    }
+
+                    VideoCallController.getInstance(this).apply {
+                        localAudioController.setRingtonePlaying(false)
+                    }
+                }
             }
         }
     }
