@@ -26,10 +26,11 @@ class FPFirebaseMessagingService: FirebaseMessagingService() {
             Log.d(tag, "Message data payload: ${remoteMessage.data}")
             when (remoteMessage.data["type"]) {
                 "incomingVideoCall" -> run {
-                    IncomingVideoCallNotification.display<FPIncomingVideoCallActivity>(
+                    IncomingVideoCallNotification.display(
                         context = this,
                         videoRoomSID = remoteMessage.data["videoRoomSID"]!!,
-                        callerDisplayName = remoteMessage.data["callerDisplayName"]!!
+                        callerDisplayName = remoteMessage.data["callerDisplayName"]!!,
+                        callerPhotoURL = remoteMessage.data["callerPhotoURL"]
                     )
                 }
                 "videoCallEnded" -> run {

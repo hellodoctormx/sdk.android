@@ -7,19 +7,16 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.hellodoctormx.sdk.HelloDoctorClient
 import com.hellodoctormx.sdk.auth.HDCurrentUser
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
-const val LOCAL_PUBLIC_API_HOST = "http://192.168.100.26:3010"
 
-abstract class AbstractHelloDoctorAPI(
-    val context: Context,
-    val host: String
-) {
+abstract class HelloDoctorHTTTPClient(val context: Context) {
+    val tag = "HelloDoctorHTTTPClient"
+
     suspend inline fun <reified T> get(path: String): T {
         return doRequest(Request.Method.GET, path, null)
     }
@@ -36,40 +33,52 @@ abstract class AbstractHelloDoctorAPI(
         return doRequest(Request.Method.DELETE, path, null)
     }
 
-    suspend inline fun <reified T> doRequest(method: Int, path: String, data: MutableMap<Any, Any>?): T {
+    suspend inline fun <reified T> doRequest(
+        method: Int,
+        path: String,
+        data: MutableMap<Any, Any>?
+    ): T = withContext(Dispatchers.IO) {
         val responseChannel = Channel<String>()
 
-        val url = "$host$path"
+        val url = "${HelloDoctorClient.serviceHost}$path"
 
-        val jsonPostData = if (data == null) JSONObject() else JSONObject(data as Map<Any, Any>)
+        val asyncRequest = async(Dispatchers.IO) {
+            val jsonPostData = if (data == null) JSONObject() else JSONObject(data as Map<Any, Any>)
 
-        val jsonObjectRequest = object : JsonObjectRequest(
-            method,
-            url,
-            jsonPostData,
-            {
-                runBlocking(Dispatchers.IO) {
-                    responseChannel.send(it.toString())
+            val jsonObjectRequest = object : JsonObjectRequest(
+                method,
+                url,
+                jsonPostData,
+                {
+                    launch(Dispatchers.IO) {
+                        responseChannel.send(it.toString())
+                        responseChannel.close()
+                    }
+                },
+                {
+                    Log.w(tag, "[doRequest:$method:$url:ERROR] ${it.message}")
+                    throw it
                 }
+            ) {
+                override fun getHeaders(): MutableMap<String, String> {
+                    return getAuthorizationHeaders()
+                }
+            }
 
-                responseChannel.close()
-            },
-            {
-                Log.w("AbstractServiceClient","[doRequest:$method:$url:ERROR] ${it.message}")
-                throw it
+            Log.v(tag, "[request] $jsonObjectRequest")
+
+            with(Volley.newRequestQueue(context)) {
+                add(jsonObjectRequest)
             }
-        ) {
-            override fun getHeaders(): MutableMap<String, String> {
-                return getAuthorizationHeaders()
-            }
+
+            responseChannel.receive()
         }
 
-        val queue = Volley.newRequestQueue(context)
-        queue.add(jsonObjectRequest)
+        val response = asyncRequest.await()
 
-        val response = responseChannel.receive()
+        Log.v(tag, "[response] $response")
 
-        return Json.decodeFromString(response)
+        return@withContext Json.decodeFromString(response)
     }
 
     fun getAuthorizationHeaders(): MutableMap<String, String> {

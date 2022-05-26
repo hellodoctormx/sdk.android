@@ -4,10 +4,7 @@ import android.content.Context
 import com.hellodoctormx.sdk.types.Consultation
 import kotlinx.serialization.Serializable
 
-class UserServiceClient(
-    context: Context,
-    host: String = LOCAL_PUBLIC_API_HOST
-) : AbstractHelloDoctorAPI(context, host = host) {
+class UsersAPI(context: Context) : HelloDoctorHTTTPClient(context) {
     suspend fun createUser(email: String): CreateUserResponse {
         return this.post(
             path = "/users",
@@ -24,18 +21,9 @@ class UserServiceClient(
         )
     }
 
-    suspend fun getUserConsultations(limit: Int): GetUserConsultationsResponse {
-        return this.get(
-            path = "/consultations?limit=$limit"
-        )
-    }
-
     @Serializable
     data class CreateUserResponse(val uid: String)
 
     @Serializable
     data class AuthenticateUserResponse(val bearerToken: String, val refreshToken: String)
-
-    @Serializable
-    data class GetUserConsultationsResponse(val consultations: List<Consultation>)
 }

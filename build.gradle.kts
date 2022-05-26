@@ -10,3 +10,9 @@ plugins {
 kotlin {
     jvm()
 }
+
+buildscript {
+    extra.apply {
+        set("compileSdk", 32)
+    }
+}

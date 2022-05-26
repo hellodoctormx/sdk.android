@@ -1,6 +1,5 @@
 package com.hellodoctormx.examples.foodpass
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -20,10 +19,7 @@ import com.google.firebase.ktx.Firebase
 import com.hellodoctormx.examples.foodpass.FPFirebaseMessagingService.Companion.registerFirebaseMessagingToken
 import com.hellodoctormx.examples.foodpass.ui.theme.FoodPassTheme
 import com.hellodoctormx.sdk.HelloDoctorClient
-import com.hellodoctormx.sdk.HelloDoctorClient.IncomingVideoCall.videoRoomSID
-import com.hellodoctormx.sdk.video.CALLER_DISPLAY_NAME
-import com.hellodoctormx.sdk.video.INCOMING_VIDEO_CALL_ACTION
-import com.hellodoctormx.sdk.video.VIDEO_ROOM_SID
+import com.hellodoctormx.sdk.video.*
 import kotlinx.coroutines.launch
 
 const val HELLO_DOCTOR_API_KEY = "NOT_A_KEY"
@@ -69,9 +65,10 @@ class MainActivity : ComponentActivity() {
 }
 
 fun launchCall(currentActivity: Context) {
-    val launchCallIntent = Intent(currentActivity, FPIncomingVideoCallActivity::class.java).apply {
+    val launchCallIntent = Intent(currentActivity, IncomingVideoCallActivity::class.java).apply {
         putExtra(VIDEO_ROOM_SID, "RM3b74771ad32b0cfcb76087fa9e4fa61e")
         putExtra(CALLER_DISPLAY_NAME, "Dr. Daniel Tester")
+        putExtra(CALLER_PHOTO_URL, "https://storage.googleapis.com/hellodoctor-staging-uploads/cc3823ec-c046-4e24-bcd5-da65a7012759-")
         putExtra(INCOMING_VIDEO_CALL_ACTION, "answered")
     }
 
@@ -81,8 +78,7 @@ fun launchCall(currentActivity: Context) {
 class HomeScreenViewModel : ViewModel() {
     fun doSignIn(context: Context, currentUser: FirebaseUser) {
         viewModelScope.launch {
-            val client = HelloDoctorClient(context)
-            client.signIn(currentUser.uid, HELLO_DOCTOR_TEST_TOKEN)
+            HelloDoctorClient.signIn(context, currentUser.uid, HELLO_DOCTOR_TEST_TOKEN)
             launchCall(context)
         }
     }

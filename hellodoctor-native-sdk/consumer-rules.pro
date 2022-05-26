@@ -24,6 +24,9 @@
 -keep class com.twilio.video.** { *; }
 -keepattributes InnerClasses
 
+-keep class com.hellodoctormx.sdk.R$* { *; }
+-keep class com.hellodoctormx.sdk.video.** { *; }
+
 ### at the recommendation of kotlinx.serialization
 # Keep `Companion` object fields of serializable classes.
 # This avoids serializer lookup through `getDeclaredClasses` as done for named companion objects.

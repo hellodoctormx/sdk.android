@@ -1,7 +1,8 @@
 package com.hellodoctormx.sdk.auth
 
 import android.content.Context
-import com.hellodoctormx.sdk.api.UserServiceClient
+import com.hellodoctormx.sdk.HelloDoctorClient
+import com.hellodoctormx.sdk.api.UsersAPI
 
 class HDCurrentUser {
     companion object {
@@ -10,7 +11,7 @@ class HDCurrentUser {
         var refreshToken: String? = null
 
         suspend fun signIn(context: Context, userID: String, serverAuthToken: String) {
-            val userServiceClient = UserServiceClient(context)
+            val userServiceClient = UsersAPI(context)
 
             val response = userServiceClient.authenticateUser(userID, serverAuthToken)
 

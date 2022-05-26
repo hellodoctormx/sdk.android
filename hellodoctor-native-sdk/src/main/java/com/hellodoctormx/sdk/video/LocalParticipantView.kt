@@ -9,15 +9,15 @@ import com.twilio.video.VideoTextureView
 class LocalParticipantView(context: Context) : VideoTextureView(context) {
     init {
         mirror = true
+
         videoScaleType = VideoScaleType.ASPECT_FIT
 
-        val aspectRatioParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        )
+        layoutParams = run {
+            val matchParent = FrameLayout.LayoutParams.MATCH_PARENT
 
-        aspectRatioParams.gravity = Gravity.CENTER
-
-        layoutParams = aspectRatioParams
+            FrameLayout.LayoutParams(matchParent, matchParent).apply {
+                gravity = Gravity.CENTER
+            }
+        }
     }
 }

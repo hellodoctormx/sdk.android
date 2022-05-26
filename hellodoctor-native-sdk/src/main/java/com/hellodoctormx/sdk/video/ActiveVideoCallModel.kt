@@ -9,14 +9,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hellodoctormx.sdk.HelloDoctorClient
 import com.hellodoctormx.sdk.api.VideoServiceClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ActiveVideoCallModel : ViewModel() {
     var isConnected by mutableStateOf(false)
-    var isCameraEnabled by mutableStateOf(false)
+    var isCameraEnabled by mutableStateOf(true)
     var isMicrophoneEnabled by mutableStateOf(true)
     var activeCamera by mutableStateOf("front")
-    var areControlsVisible by mutableStateOf(true)
+    var areControlsVisible by mutableStateOf(false)
 
     fun doConnect(context: Context) {
         val videoCallController = VideoCallController.getInstance(context)
@@ -36,12 +38,14 @@ class ActiveVideoCallModel : ViewModel() {
     }
 
     fun doDisconnect(context: Context) {
-        (context as Activity).finish()
-
-        val videoCallController = VideoCallController.getInstance(context)
-        videoCallController.disconnect()
+        CoroutineScope(Dispatchers.IO).launch {
+            val videoCallController = VideoCallController.getInstance(context)
+            videoCallController.disconnect()
+        }
 
         isConnected = false
+
+        (context as Activity).finish()
     }
 
     fun toggleControls() {

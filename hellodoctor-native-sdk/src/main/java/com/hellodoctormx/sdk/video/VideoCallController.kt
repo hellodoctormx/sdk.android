@@ -10,6 +10,10 @@ import android.view.WindowManager
 import com.hellodoctormx.sdk.video.listeners.ActiveRoomListener
 import com.twilio.video.*
 import com.twilio.video.ktx.enabled
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import tvi.webrtc.Camera1Enumerator
 
 interface VideoCallEventHandler {

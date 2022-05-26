@@ -2,14 +2,20 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'maven-publish'
 }
 
 def composeVersion = "1.1.1"
+def artifactId = 'hellodoctor-native-sdk'
+def groupId = 'com.hellodoctormx.sdk'
 
 android {
-    compileSdk 32
+    namespace "com.hellodoctormx.sdk"
+
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
+        versionName "0.2.0"
         minSdk 26
         targetSdk 32
 
@@ -59,6 +65,8 @@ dependencies {
 
     implementation "com.google.accompanist:accompanist-permissions:0.23.1"
 
+    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
+
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation "androidx.compose.ui:ui:$composeVersion"
     implementation "androidx.compose.material:material:$composeVersion"
@@ -74,4 +82,18 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
     debugImplementation "androidx.compose.ui:ui-tooling:$composeVersion"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            library(MavenPublication) {
+                setGroupId groupId
+                setArtifactId artifactId
+                version android.defaultConfig.versionName
+
+                artifact bundleReleaseAar
+            }
+        }
+    }
 }

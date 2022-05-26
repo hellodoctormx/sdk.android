@@ -20,6 +20,7 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keep class com.hellodoctormx.sdk.** { *; }
 -keep class tvi.webrtc.** { *; }
 -keep class com.twilio.video.** { *; }
 -keepattributes InnerClasses

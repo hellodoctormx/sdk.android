@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalPermissionsApi::class)
 
-package com.hellodoctormx.sdk.video
+package com.hellodoctormx.sdk
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.AlertDialog
