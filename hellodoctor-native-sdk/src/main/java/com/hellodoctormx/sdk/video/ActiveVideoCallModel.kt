@@ -16,6 +16,7 @@ class ActiveVideoCallModel : ViewModel() {
     var isCameraEnabled by mutableStateOf(false)
     var isMicrophoneEnabled by mutableStateOf(true)
     var activeCamera by mutableStateOf("front")
+    var areControlsVisible by mutableStateOf(true)
 
     fun doConnect(context: Context) {
         val videoCallController = VideoCallController.getInstance(context)
@@ -35,12 +36,16 @@ class ActiveVideoCallModel : ViewModel() {
     }
 
     fun doDisconnect(context: Context) {
+        (context as Activity).finish()
+
         val videoCallController = VideoCallController.getInstance(context)
         videoCallController.disconnect()
 
         isConnected = false
+    }
 
-        (context as Activity).finish()
+    fun toggleControls() {
+        areControlsVisible = !areControlsVisible
     }
 
     fun toggleCameraEnabled(context: Context) {

@@ -16,13 +16,16 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
@@ -64,23 +67,23 @@ fun RemoteParticipantAndroidView() {
 @Preview(showBackground = true)
 @Composable
 fun ActiveVideoCallControlsPreview() {
-    ActiveVideoCallControls(ActiveVideoCallModel())
+    HelloDoctorSDKTheme {
+        ActiveVideoCallControls(ActiveVideoCallModel())
+    }
 }
 
 @Composable
 fun ActiveVideoCallControls(activeVideoCallModel: ActiveVideoCallModel) {
-    HelloDoctorSDKTheme {
-        Surface(
-            shape = CircleShape,
-            modifier = Modifier.padding(12.dp),
-            color = Gray900
-        ) {
-            Row {
-                EndCallControl(activeVideoCallModel)
-                ToggleCameraEnabledButton(activeVideoCallModel)
-                ToggleMicrophoneEnabledButton(activeVideoCallModel)
-                ToggleCameraButton(activeVideoCallModel)
-            }
+    Surface(
+        shape = CircleShape,
+        modifier = Modifier.padding(12.dp),
+        color = Gray900
+    ) {
+        Row(verticalAlignment = CenterVertically) {
+            EndCallControl(activeVideoCallModel)
+            ToggleCameraEnabledButton(activeVideoCallModel)
+            ToggleMicrophoneEnabledButton(activeVideoCallModel)
+            ToggleCameraButton(activeVideoCallModel)
         }
     }
 }
@@ -121,8 +124,9 @@ fun EndCallControl(activeVideoCallModel: ActiveVideoCallModel) {
     ActiveCallControlButton(
         iconResource = R.drawable.ic_phone_solid,
         iconRotateDegrees = 135f,
+        size = 58.dp,
         background = Red500,
-        controlDescription = "endCall",
+        controlDescription = "end-call",
         onClick = { activeVideoCallModel.doDisconnect(context) }
     )
 }
@@ -133,7 +137,7 @@ fun ToggleCameraEnabledButton(activeVideoCallModel: ActiveVideoCallModel) {
 
     ActiveCallControlButton(
         iconResource = if (activeVideoCallModel.isCameraEnabled) R.drawable.ic_video_solid else R.drawable.ic_video_slash_solid,
-        controlDescription = "toggleVideo",
+        controlDescription = "toggle-camera-enabled",
         onClick = {
             activeVideoCallModel.toggleCameraEnabled(context)
         }
@@ -146,7 +150,7 @@ fun ToggleMicrophoneEnabledButton(activeVideoCallModel: ActiveVideoCallModel) {
 
     ActiveCallControlButton(
         iconResource = if (activeVideoCallModel.isMicrophoneEnabled) R.drawable.ic_microphone_solid else R.drawable.ic_microphone_slash_solid,
-        controlDescription = "toggleAudio",
+        controlDescription = "toggle-microphone-enabled",
         onClick = {
             activeVideoCallModel.toggleMicrophoneEnabled(context)
         }
@@ -160,7 +164,7 @@ fun ToggleCameraButton(activeVideoCallModel: ActiveVideoCallModel) {
     ActiveCallControlButton(
         iconResource = R.drawable.ic_arrows_rotate_solid,
         iconRotateDegrees = if (activeVideoCallModel.activeCamera == "front") 0f else 90f,
-        controlDescription = "toggleAudio",
+        controlDescription = "toggle-camera",
         onClick = {
             activeVideoCallModel.toggleCamera(context)
         }
@@ -173,13 +177,14 @@ fun ActiveCallControlButton(
     iconRotateDegrees: Float = 0f,
     controlDescription: String,
     background: Color = Gray500,
+    size: Dp = 48.dp,
     onClick: () -> Unit
 ) {
     Box(
-        modifier = Modifier.padding(12.dp)
+        modifier = Modifier.padding(18.dp)
     ) {
         Box(modifier = Modifier
-            .size(48.dp)
+            .size(size)
             .clip(CircleShape)
             .background(background)
             .clickable { onClick() }

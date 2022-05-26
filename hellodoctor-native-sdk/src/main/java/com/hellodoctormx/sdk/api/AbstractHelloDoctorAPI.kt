@@ -5,6 +5,7 @@ import android.util.Log
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.hellodoctormx.sdk.HelloDoctorClient
 import com.hellodoctormx.sdk.auth.HDCurrentUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -17,7 +18,7 @@ const val LOCAL_PUBLIC_API_HOST = "http://192.168.100.26:3010"
 
 abstract class AbstractHelloDoctorAPI(
     val context: Context,
-    val host: String? = defaultServiceHost
+    val host: String
 ) {
     suspend inline fun <reified T> get(path: String): T {
         return doRequest(Request.Method.GET, path, null)
@@ -79,15 +80,10 @@ abstract class AbstractHelloDoctorAPI(
             headers["Authorization"] = "Bearer $it"
         }
 
-        apiKey?.let {
+        HelloDoctorClient.apiKey?.let {
             headers["X-Api-Key"] = it
         }
 
         return headers
-    }
-
-    companion object {
-        var apiKey: String? = null
-        var defaultServiceHost: String? = null
     }
 }

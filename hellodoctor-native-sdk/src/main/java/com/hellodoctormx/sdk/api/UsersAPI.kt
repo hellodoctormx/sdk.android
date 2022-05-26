@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 class UserServiceClient(
     context: Context,
-    host: String? = LOCAL_PUBLIC_API_HOST
+    host: String = LOCAL_PUBLIC_API_HOST
 ) : AbstractHelloDoctorAPI(context, host = host) {
     suspend fun createUser(email: String): CreateUserResponse {
         return this.post(

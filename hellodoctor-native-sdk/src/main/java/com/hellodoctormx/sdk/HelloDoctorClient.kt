@@ -48,8 +48,8 @@ class HelloDoctorClient(private val context: Context) {
         var serviceHost: String? = null
 
         fun configure(apiKey: String, serviceHost: String) {
-            AbstractHelloDoctorAPI.apiKey = apiKey
-            AbstractHelloDoctorAPI.defaultServiceHost = serviceHost
+            this.apiKey = apiKey
+            this.serviceHost = serviceHost
         }
     }
 

@@ -10,6 +10,8 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.hellodoctormx.sdk.video.INCOMING_VIDEO_CALL_NOTIFICATION_ID
+import com.hellodoctormx.sdk.video.IncomingVideoCallActivity
+import com.hellodoctormx.sdk.video.IncomingVideoCallNotification
 import com.hellodoctormx.sdk.video.VideoCallController
 
 class FPFirebaseMessagingService: FirebaseMessagingService() {
@@ -24,20 +26,14 @@ class FPFirebaseMessagingService: FirebaseMessagingService() {
             Log.d(tag, "Message data payload: ${remoteMessage.data}")
             when (remoteMessage.data["type"]) {
                 "incomingVideoCall" -> run {
-                    displayIncomingCallNotification(
+                    IncomingVideoCallNotification.display<FPIncomingVideoCallActivity>(
                         context = this,
                         videoRoomSID = remoteMessage.data["videoRoomSID"]!!,
                         callerDisplayName = remoteMessage.data["callerDisplayName"]!!
                     )
                 }
                 "videoCallEnded" -> run {
-                    NotificationManagerCompat.from(this).apply {
-                        cancel(INCOMING_VIDEO_CALL_NOTIFICATION_ID)
-                    }
-
-                    VideoCallController.getInstance(this).apply {
-                        localAudioController.setRingtonePlaying(false)
-                    }
+                    IncomingVideoCallNotification.cancel(this)
                 }
             }
         }

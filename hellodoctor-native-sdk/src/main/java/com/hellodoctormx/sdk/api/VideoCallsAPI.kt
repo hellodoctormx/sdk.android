@@ -7,7 +7,7 @@ const val LOCAL_VIDEO_SERVICE_HOST = "http://192.168.100.26:3002"
 
 class VideoServiceClient(
     context: Context,
-    host: String? = LOCAL_VIDEO_SERVICE_HOST
+    host: String = LOCAL_VIDEO_SERVICE_HOST
 ) : AbstractHelloDoctorAPI(context, host = host) {
     suspend fun requestVideoCallAccess(videoRoomSID: String): RequestVideoCallAccessResponse {
         return this.get(path = "/calls/$videoRoomSID/access-token")
