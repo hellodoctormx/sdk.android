@@ -5,6 +5,7 @@ plugins {
     id ("org.jetbrains.kotlin.multiplatform") version "1.6.10"
     id ("org.jetbrains.kotlin.plugin.serialization") version "1.6.10"
     id ("com.google.gms.google-services") version "4.3.10"
+    id ("org.jetbrains.dokka") version "1.6.21"
 }
 
 kotlin {

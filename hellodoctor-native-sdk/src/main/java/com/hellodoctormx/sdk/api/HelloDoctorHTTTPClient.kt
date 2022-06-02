@@ -49,9 +49,9 @@ abstract class HelloDoctorHTTTPClient(val context: Context) {
                 method,
                 url,
                 jsonPostData,
-                {
+                { jsonObjectResponse ->
                     launch(Dispatchers.IO) {
-                        responseChannel.send(it.toString())
+                        responseChannel.send(jsonObjectResponse.toString())
                         responseChannel.close()
                     }
                 },
