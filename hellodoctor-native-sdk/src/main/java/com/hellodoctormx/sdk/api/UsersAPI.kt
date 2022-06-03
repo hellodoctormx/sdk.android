@@ -1,7 +1,6 @@
 package com.hellodoctormx.sdk.api
 
 import android.content.Context
-import com.hellodoctormx.sdk.types.Consultation
 import kotlinx.serialization.Serializable
 
 class UsersAPI(context: Context) : HelloDoctorHTTTPClient(context) {

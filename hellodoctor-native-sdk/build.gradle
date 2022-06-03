@@ -16,7 +16,7 @@ android {
     compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
-        versionName "0.2.0"
+        versionName "0.2.1"
         minSdk 26
         targetSdk 32
 
@@ -87,6 +87,17 @@ dependencies {
 
 project.afterEvaluate {
     publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/hellodoctormx/REPOSITORY")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                }
+            }
+        }
+
         publications {
             library(MavenPublication) {
                 setGroupId groupId
@@ -94,6 +105,10 @@ project.afterEvaluate {
                 version android.defaultConfig.versionName
 
                 artifact bundleReleaseAar
+            }
+
+            gpr(MavenPublication) {
+                from(components.java)
             }
         }
     }

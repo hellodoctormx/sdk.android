@@ -37,21 +37,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun VideoCallScreen(
-    activeVideoCallModel: ActiveVideoCallModel,
+    videoCallModel: VideoCallModel,
     isConnected: Boolean = false
 ) {
-    if (isConnected) ActiveVideoCallScreen(activeVideoCallModel)
-    else IncomingVideoCallScreen(activeVideoCallModel)
+    if (isConnected) ActiveVideoCallScreen(videoCallModel)
+    else IncomingVideoCallScreen(videoCallModel)
 }
 
 @Composable
-fun IncomingVideoCallScreen(
-    activeVideoCallModel: ActiveVideoCallModel,
-    isPreview: Boolean? = false
-) {
+fun IncomingVideoCallScreen(videoCallModel: VideoCallModel) {
     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-        if (activeVideoCallModel.isConnected) {
-            ActiveVideoCallScreen(activeVideoCallModel = activeVideoCallModel)
+        if (videoCallModel.isConnected) {
+            ActiveVideoCallScreen(videoCallModel = videoCallModel)
         } else {
             Surface(modifier = Modifier.fillMaxSize(), color = Color.Black.copy(alpha = 0.9f)) {
                 Column(
@@ -67,7 +64,7 @@ fun IncomingVideoCallScreen(
                             .fillMaxHeight(0.5f)
                             .clip(RoundedCornerShape(24.dp))
                     ) {
-                        if (isPreview != true) LocalParticipantAndroidView()
+                        if (!videoCallModel.isPreview) LocalParticipantAndroidView()
                     }
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
@@ -75,11 +72,11 @@ fun IncomingVideoCallScreen(
                             .fillMaxWidth()
                             .padding(bottom = 12.dp)
                     ) {
-                        ToggleCameraEnabledButton(activeVideoCallModel, size = 58.dp)
-                        ToggleMicrophoneEnabledButton(activeVideoCallModel, size = 58.dp)
-                        ToggleCameraButton(activeVideoCallModel, size = 58.dp)
+                        ToggleCameraEnabledButton(videoCallModel, size = 58.dp)
+                        ToggleMicrophoneEnabledButton(videoCallModel, size = 58.dp)
+                        ToggleCameraButton(videoCallModel, size = 58.dp)
                     }
-                    IncomingVideoCallControls(activeVideoCallModel)
+                    IncomingVideoCallControls(videoCallModel)
                 }
             }
         }
@@ -90,7 +87,7 @@ fun IncomingVideoCallScreen(
 @Composable
 fun IncomingVideoCallScreenPreview() {
     HelloDoctorSDKTheme {
-        IncomingVideoCallScreen(activeVideoCallModel = ActiveVideoCallModel(), isPreview = true)
+        IncomingVideoCallScreen(VideoCallModel(isPreview = true))
     }
 }
 
@@ -98,7 +95,7 @@ fun IncomingVideoCallScreenPreview() {
 @Composable
 fun ActiveVideoCallScreenPreview() {
     HelloDoctorSDKTheme {
-        ActiveVideoCallScreen(ActiveVideoCallModel(), isPreview = true)
+        ActiveVideoCallScreen(VideoCallModel(isPreview = true))
     }
 }
 
@@ -136,7 +133,7 @@ fun IncomingVideoCallHeader() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ActiveVideoCallScreen(activeVideoCallModel: ActiveVideoCallModel, isPreview: Boolean? = false) {
+fun ActiveVideoCallScreen(videoCallModel: VideoCallModel) {
     val context = LocalContext.current
     val density = LocalDensity.current
 
@@ -146,38 +143,38 @@ fun ActiveVideoCallScreen(activeVideoCallModel: ActiveVideoCallModel, isPreview:
     LaunchedEffect(Unit) {
         IncomingVideoCallNotification.cancel(context)
 
-        if (!activeVideoCallModel.isConnected) {
-            activeVideoCallModel.doConnect(context)
+        if (!videoCallModel.isConnected) {
+            videoCallModel.doConnect(context)
         }
     }
 
-    LaunchedEffect(activeVideoCallModel.areControlsVisible) {
-        if (activeVideoCallModel.areControlsVisible) {
+    LaunchedEffect(videoCallModel.areControlsVisible) {
+        if (videoCallModel.areControlsVisible) {
             launch {
                 delay(4000L)
-                activeVideoCallModel.areControlsVisible = false
+                videoCallModel.areControlsVisible = false
             }
         }
     }
 
-    AnimatedVisibility(visible = activeVideoCallModel.isConnected, enter = fadeIn(), exit = fadeOut()) {
+    AnimatedVisibility(visible = videoCallModel.isConnected, enter = fadeIn(), exit = fadeOut()) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = Color.Black,
-            onClick = { activeVideoCallModel.toggleControls() }) {
-            if (isPreview != true) RemoteParticipantAndroidView()
-            if (isPreview == true) Box(
+            onClick = { videoCallModel.toggleControls() }) {
+            if (!videoCallModel.isPreview) RemoteParticipantAndroidView()
+            else Box(
                 modifier = Modifier
                     .background(Blue500)
                     .fillMaxSize()
                     .zIndex(0f)
             )
             LocalParticipantPortal {
-                if (isPreview != true) LocalParticipantAndroidView()
+                if (!videoCallModel.isPreview) LocalParticipantAndroidView()
                 else Box {}
             }
             AnimatedVisibility(
-                visible = activeVideoCallModel.areControlsVisible,
+                visible = videoCallModel.areControlsVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier = Modifier.fillMaxSize()
@@ -200,7 +197,7 @@ fun ActiveVideoCallScreen(activeVideoCallModel: ActiveVideoCallModel, isPreview:
                 }
             }
             AnimatedVisibility(
-                visible = activeVideoCallModel.areControlsVisible,
+                visible = videoCallModel.areControlsVisible,
                 enter = slideInVertically(initialOffsetY = { with(density) { 20.dp.roundToPx() } }) + fadeIn(),
                 exit = slideOutVertically(targetOffsetY = { with(density) { 20.dp.roundToPx() } }) + fadeOut()
             ) {
@@ -209,7 +206,7 @@ fun ActiveVideoCallScreen(activeVideoCallModel: ActiveVideoCallModel, isPreview:
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(bottom = 48.dp)
                 ) {
-                    ActiveVideoCallControls(activeVideoCallModel)
+                    ActiveVideoCallControls(videoCallModel)
                 }
             }
         }

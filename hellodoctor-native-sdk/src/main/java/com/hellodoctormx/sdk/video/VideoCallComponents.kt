@@ -39,7 +39,7 @@ fun Context.getActivity(): AppCompatActivity? = when (this) {
 @Composable
 fun ActiveVideoCallControlsPreview() {
     HelloDoctorSDKTheme {
-        ActiveVideoCallControls(ActiveVideoCallModel())
+        ActiveVideoCallControls(VideoCallModel())
     }
 }
 
@@ -47,7 +47,7 @@ fun ActiveVideoCallControlsPreview() {
 @Composable
 fun IncomingVideoCallControlsPreview() {
     HelloDoctorSDKTheme {
-        IncomingVideoCallControls(ActiveVideoCallModel())
+        IncomingVideoCallControls(VideoCallModel())
     }
 }
 
@@ -73,7 +73,7 @@ fun RemoteParticipantAndroidView() {
 }
 
 @Composable
-fun IncomingVideoCallControls(activeVideoCallModel: ActiveVideoCallModel) {
+fun IncomingVideoCallControls(videoCallModel: VideoCallModel) {
     val context = LocalContext.current
 
     Surface(color = Color.Transparent) {
@@ -83,41 +83,41 @@ fun IncomingVideoCallControls(activeVideoCallModel: ActiveVideoCallModel) {
                 .padding(start = 42.dp, end = 42.dp, bottom = 42.dp)
         ) {
             Button(
-                onClick = { activeVideoCallModel.doConnect(context) },
+                onClick = { videoCallModel.doConnect(context) },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Green200),
                 modifier = Modifier.fillMaxWidth().size(72.dp).padding(bottom = 24.dp)
             ) {
                 Text(text = "Comenzar consulta", color = Color.White)
             }
             Button(
-                onClick = { activeVideoCallModel.doDisconnect(context) },
+                onClick = { videoCallModel.doDisconnect(context) },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Red500),
                 modifier = Modifier.fillMaxWidth().size(72.dp).padding(bottom = 24.dp)
             ) {
-                Text(text = "Recharzar consulta", color = Color.White)
+                Text(text = "Rechazar consulta", color = Color.White)
             }
         }
     }
 }
 
 @Composable
-fun ActiveVideoCallControls(activeVideoCallModel: ActiveVideoCallModel) {
+fun ActiveVideoCallControls(videoCallModel: VideoCallModel) {
     Surface(
         shape = CircleShape,
         modifier = Modifier.padding(15.dp),
         color = Gray900.copy(alpha = 0.75f)
     ) {
         Row(verticalAlignment = CenterVertically, modifier = Modifier.padding(9.dp)) {
-            EndCallControl(activeVideoCallModel)
-            ToggleCameraEnabledButton(activeVideoCallModel)
-            ToggleMicrophoneEnabledButton(activeVideoCallModel)
-            ToggleCameraButton(activeVideoCallModel)
+            EndCallControl(videoCallModel)
+            ToggleCameraEnabledButton(videoCallModel)
+            ToggleMicrophoneEnabledButton(videoCallModel)
+            ToggleCameraButton(videoCallModel)
         }
     }
 }
 
 @Composable
-fun EndCallControl(activeVideoCallModel: ActiveVideoCallModel) {
+fun EndCallControl(videoCallModel: VideoCallModel) {
     val context = LocalContext.current
 
     ActiveCallControlButton(
@@ -126,49 +126,49 @@ fun EndCallControl(activeVideoCallModel: ActiveVideoCallModel) {
         size = 64.dp,
         background = Red500,
         controlDescription = "end-call",
-        onClick = { activeVideoCallModel.doDisconnect(context) }
+        onClick = { videoCallModel.doDisconnect(context) }
     )
 }
 
 @Composable
-fun ToggleCameraEnabledButton(activeVideoCallModel: ActiveVideoCallModel, size: Dp = 54.dp) {
+fun ToggleCameraEnabledButton(videoCallModel: VideoCallModel, size: Dp = 54.dp) {
     val context = LocalContext.current
 
     ActiveCallControlButton(
-        iconResource = if (activeVideoCallModel.isCameraEnabled) R.drawable.ic_video_solid else R.drawable.ic_video_slash_solid,
+        iconResource = if (videoCallModel.isCameraEnabled) R.drawable.ic_video_solid else R.drawable.ic_video_slash_solid,
         size = size,
         controlDescription = "toggle-camera-enabled",
         onClick = {
-            activeVideoCallModel.toggleCameraEnabled(context)
+            videoCallModel.toggleCameraEnabled(context)
         }
     )
 }
 
 @Composable
-fun ToggleMicrophoneEnabledButton(activeVideoCallModel: ActiveVideoCallModel, size: Dp = 54.dp) {
+fun ToggleMicrophoneEnabledButton(videoCallModel: VideoCallModel, size: Dp = 54.dp) {
     val context = LocalContext.current
 
     ActiveCallControlButton(
-        iconResource = if (activeVideoCallModel.isMicrophoneEnabled) R.drawable.ic_microphone_solid else R.drawable.ic_microphone_slash_solid,
+        iconResource = if (videoCallModel.isMicrophoneEnabled) R.drawable.ic_microphone_solid else R.drawable.ic_microphone_slash_solid,
         size = size,
         controlDescription = "toggle-microphone-enabled",
         onClick = {
-            activeVideoCallModel.toggleMicrophoneEnabled(context)
+            videoCallModel.toggleMicrophoneEnabled(context)
         }
     )
 }
 
 @Composable
-fun ToggleCameraButton(activeVideoCallModel: ActiveVideoCallModel, size: Dp = 54.dp) {
+fun ToggleCameraButton(videoCallModel: VideoCallModel, size: Dp = 54.dp) {
     val context = LocalContext.current
 
     ActiveCallControlButton(
         size = size,
         iconResource = R.drawable.ic_arrows_rotate_solid,
-        iconRotateDegrees = if (activeVideoCallModel.activeCamera == "front") 0f else 90f,
+        iconRotateDegrees = if (videoCallModel.activeCamera == "front") 0f else 90f,
         controlDescription = "toggle-camera",
         onClick = {
-            activeVideoCallModel.toggleCamera(context)
+            videoCallModel.toggleCamera(context)
         }
     )
 }

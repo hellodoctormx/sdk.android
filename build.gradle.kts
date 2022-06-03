@@ -14,6 +14,6 @@ kotlin {
 
 buildscript {
     extra.apply {
-        set("compileSdk", 32)
+        set("compileSdk", 31)
     }
 }

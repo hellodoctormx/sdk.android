@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ActiveVideoCallModel : ViewModel() {
+class VideoCallModel(val isPreview: Boolean = false) : ViewModel() {
     var isConnected by mutableStateOf(false)
     var isCameraEnabled by mutableStateOf(true)
     var isMicrophoneEnabled by mutableStateOf(true)

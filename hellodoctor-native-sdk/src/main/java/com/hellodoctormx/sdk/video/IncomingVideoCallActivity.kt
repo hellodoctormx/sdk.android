@@ -2,8 +2,6 @@ package com.hellodoctormx.sdk.video
 
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.ViewCompat
@@ -43,7 +41,7 @@ open class IncomingVideoCallActivity : ComponentActivity() {
 
         HelloDoctorClient.registerIncomingVideoCall(videoRoomSID, callerDisplayName, callerPhotoURL)
 
-        val activeVideoCallModel = ActiveVideoCallModel()
+        val videoCallModel = VideoCallModel()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
@@ -60,7 +58,7 @@ open class IncomingVideoCallActivity : ComponentActivity() {
                         finish()
                     } else {
                         VideoCallScreen(
-                            activeVideoCallModel = activeVideoCallModel,
+                            videoCallModel = videoCallModel,
                             isConnected = action == "answered"
                         )
                     }
