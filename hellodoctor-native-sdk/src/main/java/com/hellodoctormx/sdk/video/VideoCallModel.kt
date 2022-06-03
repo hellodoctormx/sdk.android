@@ -8,8 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hellodoctormx.sdk.HelloDoctorClient
-import com.hellodoctormx.sdk.api.VideoServiceClient
-import kotlinx.coroutines.CoroutineScope
+import com.hellodoctormx.sdk.api.VideoCallsAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -22,11 +21,11 @@ class VideoCallModel(val isPreview: Boolean = false) : ViewModel() {
 
     fun doConnect(context: Context) {
         val videoCallController = VideoCallController.getInstance(context)
-        val videoServiceClient = VideoServiceClient(context)
+        val videoCallsAPI = VideoCallsAPI(context)
         val videoRoomSID = HelloDoctorClient.IncomingVideoCall.videoRoomSID!!
 
-        viewModelScope.launch {
-            val videoAccessTokenResponse = videoServiceClient.requestVideoCallAccess(videoRoomSID)
+        viewModelScope.launch(Dispatchers.IO) {
+            val videoAccessTokenResponse = videoCallsAPI.requestVideoCallAccess(videoRoomSID)
 
             videoCallController.connect(
                 videoRoomSID = videoRoomSID,
@@ -38,14 +37,18 @@ class VideoCallModel(val isPreview: Boolean = false) : ViewModel() {
     }
 
     fun doDisconnect(context: Context) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val videoCallController = VideoCallController.getInstance(context)
-            videoCallController.disconnect()
+        viewModelScope.launch(Dispatchers.IO) {
+            VideoCallsAPI(context).endVideoCall(HelloDoctorClient.IncomingVideoCall.videoRoomSID!!)
         }
 
-        isConnected = false
+        viewModelScope.launch(Dispatchers.IO) {
+            val videoCallController = VideoCallController.getInstance(context)
+            videoCallController.disconnect()
 
-        (context as Activity).finish()
+            isConnected = false
+
+            (context as Activity).finish()
+        }
     }
 
     fun toggleControls() {

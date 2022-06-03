@@ -6,13 +6,12 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.getSystemService
 import com.hellodoctormx.sdk.api.ConsultationsAPI
 import com.hellodoctormx.sdk.auth.HDCurrentUser
 import com.hellodoctormx.sdk.types.Consultation
 import com.hellodoctormx.sdk.video.INCOMING_VIDEO_CALL_CHANNEL
-import kotlinx.coroutines.runBlocking
-import java.lang.IllegalStateException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class HelloDoctorClient {
     companion object {
@@ -66,15 +65,12 @@ class HelloDoctorClient {
             }
         }
 
-        fun getConsultations(context: Context, limit: Int): List<Consultation> {
-            var response: ConsultationsAPI.GetUserConsultationsResponse
+        suspend fun getConsultations(context: Context, limit: Int): List<Consultation> = withContext(
+            Dispatchers.IO) {
+            val consultationsAPI = ConsultationsAPI(context)
 
-            runBlocking {
-                val consultationsAPI = ConsultationsAPI(context)
-                response = consultationsAPI.getUserConsultations(limit)
-            }
-
-            return response.consultations
+            val response = consultationsAPI.getUserConsultations(limit)
+            return@withContext response.consultations
         }
 
         fun registerIncomingVideoCall(videoRoomSID: String, callerDisplayName: String?, callerPhotoURL: String?) {

@@ -3,25 +3,18 @@ package com.hellodoctormx.sdk.video
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.*
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import com.hellodoctormx.sdk.video.listeners.ActiveRoomListener
 import com.twilio.video.*
 import com.twilio.video.ktx.enabled
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import tvi.webrtc.Camera1Enumerator
-
-interface VideoCallEventHandler {
-    fun onEvent(eventData:Bundle)
-}
 
 class VideoCallController(val context: Context) {
     private val tag = "VideoCallController"
+
+    private var connectedRoom: Room? = null
 
     private val screenController: ScreenController = ScreenController(context)
     val cameraController = CameraController(context)
@@ -33,25 +26,24 @@ class VideoCallController(val context: Context) {
     private val allEventHandlers = mutableMapOf<String, MutableList<VideoCallEventHandler>>()
 
     fun connect(videoRoomSID: String, accessToken: String) {
-        val self = this
+        connectedRoom = run {
+            val localAudioTrack = localAudioController.prepareLocalAudio()
+            val localVideoTrack = localVideoController.startLocalCapture()
 
-        val localAudioTrack = localAudioController.prepareLocalAudio()
-        val localVideoTrack = localVideoController.startLocalCapture()
+            val connectOptions = ConnectOptions.Builder(accessToken)
+                .roomName(videoRoomSID)
+                .audioTracks(listOf(localAudioTrack))
+                .videoTracks(listOf(localVideoTrack))
+                .enableAutomaticSubscription(true)
+                .encodingParameters(EncodingParameters(16, 0))
+                .build()
 
-        val connectOptions = ConnectOptions.Builder(accessToken)
-            .roomName(videoRoomSID)
-            .audioTracks(listOf(localAudioTrack))
-            .videoTracks(listOf(localVideoTrack))
-            .enableAutomaticSubscription(true)
-            .encodingParameters(EncodingParameters(16, 0))
-            .build()
+            Video.connect(context, connectOptions, ActiveRoomListener(this)).apply {
+                localParticipant?.publishTrack(localVideoTrack)
 
-        val room = Video.connect(context, connectOptions, ActiveRoomListener(self))
-        room.localParticipant?.publishTrack(localVideoTrack)
-
-        screenController.setScreenAlwaysOn(true)
-
-        activeRoom = ActiveRoom(room)
+                screenController.setScreenAlwaysOn(true)
+            }
+        }
     }
 
     fun disconnect() {
@@ -60,13 +52,12 @@ class VideoCallController(val context: Context) {
 
         screenController.setScreenAlwaysOn(false)
 
-        activeRoom?.room?.disconnect()
-        activeRoom?.room = null
-        activeRoom = null
+        connectedRoom?.disconnect()
+        connectedRoom = null
     }
 
     fun isConnectedToRoom(roomName: String): Boolean {
-        return activeRoom?.room?.name == roomName
+        return connectedRoom?.name == roomName
     }
 
     fun setLocalParticipantView(localParticipantView: LocalParticipantView?) {
@@ -78,7 +69,7 @@ class VideoCallController(val context: Context) {
     }
 
     fun renderRemoteParticipant(remoteView: VideoView, remoteParticipantIdentity: String) {
-        val remoteParticipant = activeRoom?.room?.remoteParticipants?.find { it.identity == remoteParticipantIdentity }
+        val remoteParticipant = connectedRoom?.remoteParticipants?.find { it.identity == remoteParticipantIdentity }
             ?: run {
                 Log.w("$tag:renderRemoteParticipant", "no remote participant found with identity $remoteParticipantIdentity")
                 return
@@ -110,8 +101,6 @@ class VideoCallController(val context: Context) {
     }
 
     companion object {
-        var activeRoom: ActiveRoom? = null
-
         @SuppressLint("StaticFieldLeak")
         var instance: VideoCallController? = null
 
@@ -293,6 +282,6 @@ class CameraController(val context: Context) {
     }
 }
 
-data class ActiveRoom(
-    var room: Room?,
-)
+interface VideoCallEventHandler {
+    fun onEvent(eventData:Bundle)
+}
