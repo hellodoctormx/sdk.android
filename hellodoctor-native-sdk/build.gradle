@@ -16,7 +16,7 @@ android {
     compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
-        versionName "0.2.1"
+        versionName "0.2.3"
         minSdk 26
         targetSdk 32
 
@@ -85,7 +85,8 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
 }
 
-
+def props = new Properties()
+file("gpr.properties").withInputStream { props.load(it) }
 
 project.afterEvaluate {
     publishing {

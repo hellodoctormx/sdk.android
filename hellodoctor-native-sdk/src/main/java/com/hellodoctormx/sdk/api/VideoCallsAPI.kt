@@ -16,10 +16,6 @@ class VideoServiceClient(context: Context) : HelloDoctorHTTTPClient(context) {
         return this.post(path = "/video/$videoRoomSID/_end", postData = null)
     }
 
-    suspend fun rejectVideoCall(videoRoomSID: String) {
-        return this.post(path = "/video/$videoRoomSID/_reject", postData = null)
-    }
-
     @Serializable
     data class RequestVideoCallAccessResponse(val accessToken: String)
 
