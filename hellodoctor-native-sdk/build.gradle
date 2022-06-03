@@ -85,30 +85,32 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$composeVersion"
 }
 
+
+
 project.afterEvaluate {
     publishing {
         repositories {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/hellodoctormx/REPOSITORY")
+                url = uri("https://maven.pkg.github.com/hellodoctormx/sdk.android")
                 credentials {
-                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                    username = props.getProperty("gpr.user")
+                    password = props.getProperty("gpr.key")
                 }
             }
         }
 
         publications {
+            gpr(MavenPublication) {
+                from(components.release)
+            }
+
             library(MavenPublication) {
                 setGroupId groupId
                 setArtifactId artifactId
                 version android.defaultConfig.versionName
 
                 artifact bundleReleaseAar
-            }
-
-            gpr(MavenPublication) {
-                from(components.java)
             }
         }
     }
