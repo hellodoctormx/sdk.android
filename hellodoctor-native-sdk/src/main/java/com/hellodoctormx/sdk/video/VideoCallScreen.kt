@@ -216,7 +216,7 @@ fun ActiveVideoCallScreen(videoCallModel: VideoCallModel) {
 @Composable
 fun CallerPhoto() {
     val callerPhotoURL = HelloDoctorClient.IncomingVideoCall.callerPhotoURL
-        ?: "https://storage.googleapis.com/hellodoctor-staging-uploads/cc3823ec-c046-4e24-bcd5-da65a7012759-"
+        ?: "https://firebasestorage.googleapis.com/v0/b/hellodoctor-production-303000-public/o/icon512.png?alt=media&token=78c8d2dc-2e3b-49a2-87f5-7a6d6cfab7eb"
 
     Image(
         painter = rememberAsyncImagePainter(callerPhotoURL),

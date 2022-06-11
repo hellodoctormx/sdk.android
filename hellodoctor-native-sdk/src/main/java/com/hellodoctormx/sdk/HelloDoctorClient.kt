@@ -13,10 +13,12 @@ import com.hellodoctormx.sdk.video.INCOMING_VIDEO_CALL_CHANNEL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+const val DEFAULT_SERVICE_HOST = "https://public-api-pusuheofiq-uc.a.run.app"
+
 class HelloDoctorClient {
     companion object {
         var apiKey: String? = null
-        var serviceHost: String? = null
+        var serviceHost: String = DEFAULT_SERVICE_HOST
 
         fun configure(apiKey: String, serviceHost: String) {
             this.apiKey = apiKey
@@ -52,13 +54,14 @@ class HelloDoctorClient {
                         0, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500
                     )
 
-                    val ringtoneSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-                    val ringtoneAttributes = AudioAttributes.Builder()
-                        .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
-                        .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                        .build()
+                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)?.let { ringtoneSound ->
+                        val ringtoneAttributes = AudioAttributes.Builder()
+                            .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                            .build()
 
-                    setSound(ringtoneSound, ringtoneAttributes)
+                        setSound(ringtoneSound, ringtoneAttributes)
+                    }
                 }
 
                 notificationManager.createNotificationChannel(channel)

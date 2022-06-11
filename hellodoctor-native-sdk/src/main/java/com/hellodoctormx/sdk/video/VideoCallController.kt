@@ -174,20 +174,11 @@ class LocalVideoController(val context: Context, private val cameraController: C
 }
 
 class LocalAudioController(val context: Context) {
-    private var audioManager: AudioManager
+    private var audioManager: AudioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private var focusRequest: AudioFocusRequest? = null
     private var originalAudioMode = AudioManager.MODE_NORMAL
 
-    var ringtone: Ringtone
-
     var localAudioTrack: LocalAudioTrack? = null
-
-    init {
-        val ringtoneSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-        ringtone = RingtoneManager.getRingtone(context, ringtoneSound)
-
-        audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    }
 
     fun prepareLocalAudio(): LocalAudioTrack {
         if (localAudioTrack == null) {
@@ -202,10 +193,6 @@ class LocalAudioController(val context: Context) {
 
         localAudioTrack?.release()
         localAudioTrack = null
-    }
-
-    fun setRingtonePlaying(shouldPlayRingtone: Boolean) {
-        if (shouldPlayRingtone) ringtone.play() else ringtone.stop()
     }
 
     fun setMicrophoneEnabled(enabled: Boolean) {

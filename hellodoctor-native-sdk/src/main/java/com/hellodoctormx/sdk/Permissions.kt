@@ -10,9 +10,9 @@ import androidx.compose.runtime.Composable
 import com.google.accompanist.permissions.*
 
 @Composable
-fun VideoCallPermissions(
+fun WithVideoCallPermissions(
     permissions: List<String> = listOf(android.Manifest.permission.RECORD_AUDIO, android.Manifest.permission.CAMERA),
-    rationale: String = "This permission is important for this app. Please grant the permission.",
+    rationale: String = "Necesitamos acceder a la cámara y el micrófono de su dispositivo para iniciar su videollamada.",
     permissionNotAvailableContent: @Composable () -> Unit = { },
     content: @Composable () -> Unit = { }
 ) {
@@ -31,10 +31,7 @@ fun VideoCallPermissions(
 }
 
 @Composable
-private fun Rationale(
-    text: String,
-    onRequestPermission: () -> Unit
-) {
+private fun Rationale(text: String, onRequestPermission: () -> Unit) {
     Column() {
         Button(onClick = onRequestPermission) {
             Text("Ok")
@@ -42,7 +39,7 @@ private fun Rationale(
         AlertDialog(
             onDismissRequest = { /* Don't */ },
             title = {
-                Text(text = "Permission request")
+                Text(text = "Solicitud de permiso")
             },
             text = {
                 Text(text)

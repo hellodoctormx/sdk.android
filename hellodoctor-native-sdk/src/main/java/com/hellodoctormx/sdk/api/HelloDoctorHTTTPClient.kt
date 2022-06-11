@@ -2,6 +2,8 @@ package com.hellodoctormx.sdk.api
 
 import android.content.Context
 import android.util.Log
+import com.android.volley.ClientError
+import com.android.volley.NetworkError
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -21,11 +23,11 @@ abstract class HelloDoctorHTTTPClient(val context: Context) {
         return doRequest(Request.Method.GET, path, null)
     }
 
-    suspend inline fun <reified T> post(path: String, postData: MutableMap<Any, Any>?): T {
+    suspend inline fun <reified T> post(path: String, postData: Map<String, Any>?): T {
         return doRequest(Request.Method.POST, path, postData)
     }
 
-    suspend inline fun <reified T> put(path: String, postData: MutableMap<Any, Any>?): T {
+    suspend inline fun <reified T> put(path: String, postData: Map<String, Any>?): T {
         return doRequest(Request.Method.PUT, path, postData)
     }
 
@@ -36,14 +38,14 @@ abstract class HelloDoctorHTTTPClient(val context: Context) {
     suspend inline fun <reified T> doRequest(
         method: Int,
         path: String,
-        data: MutableMap<Any, Any>?
+        data: Map<String, Any>?
     ): T = withContext(Dispatchers.IO) {
         val responseChannel = Channel<String>()
 
         val url = "${HelloDoctorClient.serviceHost}$path"
 
         val asyncRequest = async(Dispatchers.IO) {
-            val jsonPostData = if (data == null) JSONObject() else JSONObject(data as Map<Any, Any>)
+            val jsonPostData = if (data == null) JSONObject() else JSONObject(data)
 
             val jsonObjectRequest = object : JsonObjectRequest(
                 method,
@@ -55,9 +57,9 @@ abstract class HelloDoctorHTTTPClient(val context: Context) {
                         responseChannel.close()
                     }
                 },
-                {
-                    Log.w(tag, "[doRequest:$method:$url:ERROR] ${it.message}")
-                    throw it
+                { error ->
+                    Log.w(tag, "[doRequest:$method:$url:ERROR] ${error.message}")
+                    throw error
                 }
             ) {
                 override fun getHeaders(): MutableMap<String, String> {
@@ -78,7 +80,9 @@ abstract class HelloDoctorHTTTPClient(val context: Context) {
 
         Log.v(tag, "[response] $response")
 
-        return@withContext Json.decodeFromString(response)
+        val json = Json {ignoreUnknownKeys = true}
+
+        return@withContext json.decodeFromString(response)
     }
 
     fun getAuthorizationHeaders(): MutableMap<String, String> {

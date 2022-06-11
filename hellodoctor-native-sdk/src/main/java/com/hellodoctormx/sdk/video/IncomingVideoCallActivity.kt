@@ -8,7 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.hellodoctormx.sdk.HelloDoctorClient
-import com.hellodoctormx.sdk.VideoCallPermissions
+import com.hellodoctormx.sdk.WithVideoCallPermissions
 import com.hellodoctormx.sdk.ui.theme.HelloDoctorSDKTheme
 
 enum class Actions(val action: String) {
@@ -50,7 +50,7 @@ open class IncomingVideoCallActivity : ComponentActivity() {
 
         setContent {
             HelloDoctorSDKTheme {
-                VideoCallPermissions {
+                WithVideoCallPermissions {
                     val action = intent.getStringExtra(INCOMING_VIDEO_CALL_ACTION)
 
                     if (action == "rejected") {

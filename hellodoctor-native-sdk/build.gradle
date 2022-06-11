@@ -16,7 +16,7 @@ android {
     compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
-        versionName "0.3.0"
+        versionName "0.3.6"
         minSdk 26
         targetSdk 32
 
@@ -104,6 +104,10 @@ project.afterEvaluate {
         publications {
             gpr(MavenPublication) {
                 from(components.release)
+
+                setGroupId groupId
+                setArtifactId artifactId
+                version android.defaultConfig.versionName
             }
 
             library(MavenPublication) {

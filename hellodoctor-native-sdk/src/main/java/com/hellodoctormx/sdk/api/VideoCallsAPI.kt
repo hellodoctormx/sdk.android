@@ -12,7 +12,7 @@ class VideoCallsAPI(context: Context) : HelloDoctorHTTTPClient(context) {
         return this.get(path = "/video/$videoRoomSID")
     }
 
-    suspend fun endVideoCall(videoRoomSID: String) {
+    suspend fun endVideoCall(videoRoomSID: String): EndVideoCallResponse {
         return this.post(path = "/video/$videoRoomSID/_end", postData = null)
     }
 
@@ -21,4 +21,7 @@ class VideoCallsAPI(context: Context) : HelloDoctorHTTTPClient(context) {
 
     @Serializable
     data class GetVideoCallResponse(val sid: String, val status: String)
+
+    @Serializable
+    data class EndVideoCallResponse(val status: String)
 }

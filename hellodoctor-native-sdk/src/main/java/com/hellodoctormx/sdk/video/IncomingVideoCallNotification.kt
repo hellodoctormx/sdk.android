@@ -29,6 +29,7 @@ object IncomingVideoCallNotification {
                 putExtra(INCOMING_VIDEO_CALL_ACTION, "answered")
                 putExtra(VIDEO_ROOM_SID, videoRoomSID)
                 putExtra(CALLER_DISPLAY_NAME, callerDisplayName)
+                putExtra(CALLER_PHOTO_URL, callerPhotoURL)
             }
 
             val answerCallPendingIntent = PendingIntent.getActivity(
@@ -69,6 +70,7 @@ object IncomingVideoCallNotification {
             action = Actions.INCOMING_VIDEO_CALL_FULLSCREEN.action
             putExtra(VIDEO_ROOM_SID, videoRoomSID)
             putExtra(CALLER_DISPLAY_NAME, callerDisplayName)
+            putExtra(CALLER_PHOTO_URL, callerPhotoURL)
         }
 
         val fullScreenPendingIntent = PendingIntent.getActivity(
