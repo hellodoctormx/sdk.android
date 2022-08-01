@@ -101,7 +101,7 @@ Add `hellodoctor-native-sdk` to your `build.gradle` dependencies.
 
 ```
 dependencies {
-    implementation "com.hellodoctormx.sdk:hellodoctor-native-sdk:0.4.1"
+    implementation "com.hellodoctormx.sdk:hellodoctor-native-sdk:0.4.3"
 }
 ```
 
