@@ -1,9 +1,7 @@
-package com.hellodoctormx.sdk.api
+package com.hellodoctormx.sdk.services
 
 import android.content.Context
 import android.util.Log
-import com.android.volley.ClientError
-import com.android.volley.NetworkError
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley

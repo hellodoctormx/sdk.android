@@ -1,16 +1,24 @@
-package com.hellodoctormx.sdk.api
+package com.hellodoctormx.sdk.services
 
 import android.content.Context
+import com.hellodoctormx.sdk.types.Availability
 import com.hellodoctormx.sdk.types.Consultation
 import kotlinx.serialization.Serializable
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-class ConsultationsAPI(context: Context) : HelloDoctorHTTTPClient(context) {
+class ConsultationService(context: Context) : HelloDoctorHTTTPClient(context) {
     suspend fun getUserConsultations(limit: Int): GetUserConsultationsResponse {
         return this.get(
             path = "/consultations?limit=$limit"
         )
+    }
+
+    suspend fun getCallCenterAvailability(specialty: String, start: ZonedDateTime, end: ZonedDateTime): GetAvailabilityResponse {
+        val formattedStart = start.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        val formattedEnd = end.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+
+        return this.get("/consultations/call-center/availability?specialty=$specialty&start=$formattedStart&end=$formattedEnd")
     }
 
     suspend fun requestCallCenterConsultation(specialty: String, requestedStart: ZonedDateTime, reason: String) {
@@ -30,4 +38,7 @@ class ConsultationsAPI(context: Context) : HelloDoctorHTTTPClient(context) {
 
     @Serializable
     data class GetUserConsultationsResponse(val consultations: List<Consultation>)
+
+    @Serializable
+    data class GetAvailabilityResponse(val availableTimes: List<Availability>)
 }

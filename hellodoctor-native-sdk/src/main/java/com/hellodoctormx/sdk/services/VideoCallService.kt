@@ -1,9 +1,9 @@
-package com.hellodoctormx.sdk.api
+package com.hellodoctormx.sdk.services
 
 import android.content.Context
 import kotlinx.serialization.Serializable
 
-class VideoCallsAPI(context: Context) : HelloDoctorHTTTPClient(context) {
+class VideoCallService(context: Context) : HelloDoctorHTTTPClient(context) {
     suspend fun requestVideoCallAccess(videoRoomSID: String): RequestVideoCallAccessResponse {
         return this.get(path = "/video/$videoRoomSID/access-token")
     }

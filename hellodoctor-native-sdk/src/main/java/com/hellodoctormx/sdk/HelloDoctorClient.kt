@@ -6,7 +6,7 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import androidx.core.app.NotificationManagerCompat
-import com.hellodoctormx.sdk.api.ConsultationsAPI
+import com.hellodoctormx.sdk.services.ConsultationService
 import com.hellodoctormx.sdk.auth.HDCurrentUser
 import com.hellodoctormx.sdk.types.Consultation
 import com.hellodoctormx.sdk.video.INCOMING_VIDEO_CALL_CHANNEL
@@ -73,9 +73,9 @@ class HelloDoctorClient {
 
         suspend fun getConsultations(context: Context, limit: Int): List<Consultation> = withContext(
             Dispatchers.IO) {
-            val consultationsAPI = ConsultationsAPI(context)
+            val consultationService = ConsultationService(context)
 
-            val response = consultationsAPI.getUserConsultations(limit)
+            val response = consultationService.getUserConsultations(limit)
             return@withContext response.consultations
         }
 

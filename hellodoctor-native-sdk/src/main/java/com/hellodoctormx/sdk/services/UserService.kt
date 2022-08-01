@@ -1,9 +1,9 @@
-package com.hellodoctormx.sdk.api
+package com.hellodoctormx.sdk.services
 
 import android.content.Context
 import kotlinx.serialization.Serializable
 
-class UsersAPI(context: Context) : HelloDoctorHTTTPClient(context) {
+class UserService(context: Context) : HelloDoctorHTTTPClient(context) {
     suspend fun createUser(email: String): CreateUserResponse {
         return this.post(
             path = "/users",

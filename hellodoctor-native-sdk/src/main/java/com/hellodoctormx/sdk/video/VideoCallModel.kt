@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hellodoctormx.sdk.HelloDoctorClient
-import com.hellodoctormx.sdk.api.VideoCallsAPI
+import com.hellodoctormx.sdk.services.VideoCallService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -24,11 +24,11 @@ class VideoCallModel(val isPreview: Boolean = false) : ViewModel() {
         roomStatus = "connecting"
 
         val videoCallController = VideoCallController.getInstance(context)
-        val videoCallsAPI = VideoCallsAPI(context)
+        val videoCallService = VideoCallService(context)
         val videoRoomSID = HelloDoctorClient.IncomingVideoCall.videoRoomSID!!
 
         viewModelScope.launch(Dispatchers.IO) {
-            val videoAccessTokenResponse = videoCallsAPI.requestVideoCallAccess(videoRoomSID)
+            val videoAccessTokenResponse = videoCallService.requestVideoCallAccess(videoRoomSID)
 
             videoCallController.connect(
                 videoRoomSID = videoRoomSID,
@@ -50,7 +50,7 @@ class VideoCallModel(val isPreview: Boolean = false) : ViewModel() {
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            VideoCallsAPI(context).endVideoCall(HelloDoctorClient.IncomingVideoCall.videoRoomSID!!)
+            VideoCallService(context).endVideoCall(HelloDoctorClient.IncomingVideoCall.videoRoomSID!!)
         }
     }
 
