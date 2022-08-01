@@ -14,6 +14,7 @@ Table of contents
 
 <!--ts-->
    * [Features](#features)
+   * [Integration Components](#integration-components)
    * [Integration Lifecycle](#integration-lifecycle)
    * [Installation](#installation)
       * [Android Requirements](#android-requirements)
@@ -26,13 +27,29 @@ Table of contents
 
 ## Features
 
-**Telehealth video calls**: The SDK handles almost everything regarding an active video call with minimal development within your own application code
+**Telemedicine video calls**: The SDK handles almost everything regarding an active video call with minimal development within your own application code
 
-**Request consultations**: Use the ConsultationService provided by the SDK to retrieve doctor availability and request a telehealth video consultation
+**Request consultations**: Use the ConsultationService provided by the SDK to retrieve doctor availability and request a telemedicine video consultation
 
 **UI Kit (in development)**: Native screens and elements to request, view and manage a user's consultations and other HelloDoctor data.
 
 <img src="https://user-images.githubusercontent.com/54091648/182131158-99a3fe47-0828-48c3-bf57-132c853d95c3.jpg" width="156"/>
+
+## Integration Components
+* **HelloDoctor Server**
+* **HelloDoctor SDK**
+* **Your Server**
+* **Your Application**
+
+**Your server** will be responsible for:
+* Creating corresponding (or "linked") HelloDoctor user accounts for your users
+* Requesting session tokens for your client applications
+* Forwarding webhook events for video calls to your devices as push notifications
+
+**Your Application** will be responsible for:
+* Requesting session tokens from your server for HelloDoctor service calls
+* Handling push notifications and calling the corresponding SDK functions (e.g. when your device receives an `incomingVideoCall` webhook, your application must then call `IncomingVideoCallNotification.display` with the webhook event payload)
+* Providing screens for scheduling and managing consultations (the SDK provides services for making the actual server requests)
 
 ## Integration Lifecycle
 ### User Creation/Authentication
@@ -41,8 +58,8 @@ Table of contents
  1. **Request linked HelloDoctor user ID and server authentication token**
  2. **Check Your Database for existing linked HelloDoctor user ID**
  3. **Depending on whether the linked user already exists:**
-		 a) If linked HelloDoctor user **exists**, request authentication token for linked user from HelloDoctor Server
-		 b) If linked user **does not exist**, send request to HelloDoctor Server to create new user
+		 a) If linked HelloDoctor user **exists**, request authentication token for linked user from **HelloDoctor Server**
+		 b) If linked user **does not exist**, send request to **HelloDoctor Server** to create new user
  4. 1.  *(Only if new linked user was just created)* **Save new HelloDoctor user ID to linked user, and then request auth token** (3a above)
  5. **Return HelloDoctor user ID and authentication token to Your Device**
  6. **Request HelloDoctor access token to authenticate current session**
@@ -101,7 +118,7 @@ Add `hellodoctor-native-sdk` to your `build.gradle` dependencies.
 
 ```
 dependencies {
-    implementation "com.hellodoctormx.sdk:hellodoctor-native-sdk:0.4.3"
+    implementation "com.hellodoctormx.sdk:hellodoctor-native-sdk:0.4.1"
 }
 ```
 
