@@ -38,10 +38,10 @@ Table of contents
 
  1. **Request linked HelloDoctor user ID and server authentication token**
  2. **Check Your Database for existing linked HelloDoctor user ID**
- 3. **Depending on whether the mapped user already exists:**
+ 3. **Depending on whether the linked user already exists:**
 		 a) If linked HelloDoctor user **exists**, request authentication token for linked user from HelloDoctor Server
 		 b) If linked user **does not exist**, send request to HelloDoctor Server to create new user
- 4. 1.  *(Only if new mapped user was just created)* **Save new HelloDoctor user ID to mapped user, and then request auth token** (3a above)
+ 4. 1.  *(Only if new linked user was just created)* **Save new HelloDoctor user ID to linked user, and then request auth token** (3a above)
  5. **Return HelloDoctor user ID and authentication token to Your Device**
  6. **Request HelloDoctor access token to authenticate current session**
 
@@ -69,7 +69,7 @@ Table of contents
 * [AndroidX](https://developer.android.com/jetpack/androidx/)
 
 ### Configuration
-Add GitHub Packages repository
+Add GitHub Packages repository (*Will eventually be moved to Maven Central*)
 ```
 def props = new Properties()  
 file("gpr.properties").withInputStream { props.load(it) }
