@@ -16,15 +16,17 @@ Table of contents
    * [Features](#features)
    * [Integration Lifecycle](#integration-lifecycle)
    * [Installation](#installation)
-      * [Requirements](#requirements)
-      * [Configuration](#configuration)
+      * [Android Requirements](#android-requirements)
+      * [Android Configuration](#android-configuration)
+      * [Server Configuration](#server-configuration)
+      * [API Key and Secret](#api-key-and-secret)
    * [Getting Started](#getting-started)
    * [Examples](#examples)
 <!--te-->
 
 ## Features
 
-**Telehealth video calls**: The SDK handles almost everything regarding an active video call with minimal configuration within your own application
+**Telehealth video calls**: The SDK handles almost everything regarding an active video call with minimal development within your own application code
 
 **Request consultations**: Use the ConsultationService provided by the SDK to retrieve doctor availability and request a telehealth video consultation
 
@@ -61,14 +63,14 @@ Table of contents
 
 ## Installation
 
-### Requirements
+### Android Requirements
 
 * Android 8.0 (API level 26) and above
 * [Android Gradle Plugin](https://developer.android.com/studio/releases/gradle-plugin) 7.2.2
 * [Gradle](https://gradle.org/releases/) 7.3.3+
 * [AndroidX](https://developer.android.com/jetpack/androidx/)
 
-### Configuration
+### Android Configuration
 Add GitHub Packages repository (*Will eventually be moved to Maven Central*)
 ```
 def props = new Properties()  
@@ -102,6 +104,38 @@ dependencies {
     implementation "com.hellodoctormx.sdk:hellodoctor-native-sdk:0.4.1"
 }
 ```
+
+### Server Configuration
+To notify your devices of incoming video calls, you server will need to handle two webhook events delivered by HelloDoctor
+* `incomingVideoCall`
+* `videoCallEnded`
+
+Both webhook events will arrive with the following payload:
+```  
+{
+	type: "incomingVideoCall" | "videoCallEnded", 
+	data: {  
+		recipientUserID: <hellodoctor-user-id>,
+		videoRoomSID: string,  
+		consultationID: string,  
+		callerDisplayName: string,  
+		callerPhotoURL: string
+	}
+}
+```
+
+The `recipientUserID` will be the linked user's HelloDoctor user ID, which is generated earlier and must be stored in your database, so that you can forward the webhook payload to the correct user's device(s).
+
+The webhook will also arrive with the following header:
+```
+{
+	"X-Api-Key": <your-api-key>
+}
+```
+This allows for an optional validation step on your server to verify that the webhook was sent from HelloDoctor.
+*Due to its overly simplistic and largely insecure nature, a more robust validation scheme will be developed in the near future*
+### API Key and Secret
+During the integration setup process, you will receive an **API key** and **API secret** to authenticate your client and server.
 
 ## Getting Started
 
