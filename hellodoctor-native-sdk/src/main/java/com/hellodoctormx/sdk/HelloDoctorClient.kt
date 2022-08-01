@@ -51,7 +51,10 @@ class HelloDoctorClient {
                     lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
 
                     vibrationPattern = longArrayOf(
-                        0, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500
+                        0, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500,
+                        1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500,
+                        900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900,
+                        1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500, 900, 1500
                     )
 
                     RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)?.let { ringtoneSound ->

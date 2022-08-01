@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -46,6 +47,14 @@ fun VideoCallScreen(
 
 @Composable
 fun IncomingVideoCallScreen(videoCallModel: VideoCallModel) {
+    val context = LocalContext.current
+
+    LaunchedEffect(videoCallModel.roomStatus) {
+        if (videoCallModel.roomStatus == "disconnected") {
+            videoCallModel.doDisconnect(context)
+        }
+    }
+
     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
         if (videoCallModel.isConnected) {
             ActiveVideoCallScreen(videoCallModel = videoCallModel)
@@ -117,10 +126,11 @@ fun IncomingVideoCallHeader() {
         Image(
             painter = rememberAsyncImagePainter(HelloDoctorClient.IncomingVideoCall.callerPhotoURL),
             contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(128.dp)
-                .border(width = 2.dp, color = Blue700, shape = CircleShape)
                 .clip(CircleShape)
+                .border(width = 2.dp, color = Blue700, shape = CircleShape)
         )
     }
     Text(
@@ -154,6 +164,12 @@ fun ActiveVideoCallScreen(videoCallModel: VideoCallModel) {
                 delay(4000L)
                 videoCallModel.areControlsVisible = false
             }
+        }
+    }
+
+    LaunchedEffect(videoCallModel.roomStatus) {
+        if (videoCallModel.roomStatus == "disconnected") {
+            videoCallModel.doDisconnect(context)
         }
     }
 
@@ -221,10 +237,11 @@ fun CallerPhoto() {
     Image(
         painter = rememberAsyncImagePainter(callerPhotoURL),
         contentDescription = null,
+        contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(96.dp)
-            .border(width = 1.dp, color = Blue700, shape = CircleShape)
             .clip(CircleShape)
+            .border(width = 1.dp, color = Blue700, shape = CircleShape)
     )
 }
 

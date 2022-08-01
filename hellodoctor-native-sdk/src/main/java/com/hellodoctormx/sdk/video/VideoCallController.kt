@@ -159,9 +159,6 @@ class LocalVideoController(val context: Context, private val cameraController: C
     }
 
     fun stopLocalCapture() {
-        val cameraCapturer = cameraController.getCameraCapturer()
-        cameraCapturer.stopCapture()
-
         localVideoTrack?.release()
         localVideoTrack = null
 

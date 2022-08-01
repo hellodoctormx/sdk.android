@@ -45,7 +45,7 @@ abstract class HelloDoctorHTTTPClient(val context: Context) {
         val url = "${HelloDoctorClient.serviceHost}$path"
 
         val asyncRequest = async(Dispatchers.IO) {
-            val jsonPostData = if (data == null) JSONObject() else JSONObject(data)
+            val jsonPostData = if (data == null) null else JSONObject(data)
 
             val jsonObjectRequest = object : JsonObjectRequest(
                 method,

@@ -14,12 +14,15 @@ import kotlinx.coroutines.launch
 
 class VideoCallModel(val isPreview: Boolean = false) : ViewModel() {
     var isConnected by mutableStateOf(false)
+    var roomStatus by mutableStateOf("")
     var isCameraEnabled by mutableStateOf(true)
     var isMicrophoneEnabled by mutableStateOf(true)
     var activeCamera by mutableStateOf("front")
     var areControlsVisible by mutableStateOf(false)
 
     fun doConnect(context: Context) {
+        roomStatus = "connecting"
+
         val videoCallController = VideoCallController.getInstance(context)
         val videoCallsAPI = VideoCallsAPI(context)
         val videoRoomSID = HelloDoctorClient.IncomingVideoCall.videoRoomSID!!
@@ -37,17 +40,17 @@ class VideoCallModel(val isPreview: Boolean = false) : ViewModel() {
     }
 
     fun doDisconnect(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            VideoCallsAPI(context).endVideoCall(HelloDoctorClient.IncomingVideoCall.videoRoomSID!!)
-        }
+        isConnected = false
 
         viewModelScope.launch(Dispatchers.IO) {
             val videoCallController = VideoCallController.getInstance(context)
             videoCallController.disconnect()
 
-            isConnected = false
-
             (context as Activity).finish()
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            VideoCallsAPI(context).endVideoCall(HelloDoctorClient.IncomingVideoCall.videoRoomSID!!)
         }
     }
 
@@ -74,5 +77,17 @@ class VideoCallModel(val isPreview: Boolean = false) : ViewModel() {
         videoCallController.cameraController.switchCamera()
 
         activeCamera = if (activeCamera == "front") "back" else "front"
+    }
+
+    companion object {
+        private var instance_: VideoCallModel? = null
+
+        fun getInstance(): VideoCallModel {
+            if (instance_ == null) {
+                instance_ = VideoCallModel()
+            }
+
+            return instance_!!
+        }
     }
 }

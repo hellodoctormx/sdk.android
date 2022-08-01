@@ -13,6 +13,7 @@ import com.hellodoctormx.sdk.ui.theme.HelloDoctorSDKTheme
 
 enum class Actions(val action: String) {
     INCOMING_VIDEO_CALL_ANSWERED("com.hellodoctormx.sdk.action.INCOMING_VIDEO_CALL_ANSWERED"),
+    INCOMING_VIDEO_CALL_ENDED("com.hellodoctormx.sdk.action.INCOMING_VIDEO_CALL_ENDED"),
     INCOMING_VIDEO_CALL_FULLSCREEN("com.hellodoctormx.sdk.action.INCOMING_VIDEO_CALL_FULLSCREEN"),
     INCOMING_VIDEO_CALL_REJECTED("com.hellodoctormx.sdk.action.INCOMING_VIDEO_CALL_REJECTED")
 }
@@ -41,7 +42,8 @@ open class IncomingVideoCallActivity : ComponentActivity() {
 
         HelloDoctorClient.registerIncomingVideoCall(videoRoomSID, callerDisplayName, callerPhotoURL)
 
-        val videoCallModel = VideoCallModel()
+        val videoCallModel = VideoCallModel.getInstance()
+        videoCallModel.roomStatus = ""
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
@@ -51,16 +53,18 @@ open class IncomingVideoCallActivity : ComponentActivity() {
         setContent {
             HelloDoctorSDKTheme {
                 WithVideoCallPermissions {
-                    val action = intent.getStringExtra(INCOMING_VIDEO_CALL_ACTION)
-
-                    if (action == "rejected") {
-                        IncomingVideoCallNotification.cancel(this)
-                        finish()
-                    } else {
-                        VideoCallScreen(
-                            videoCallModel = videoCallModel,
-                            isConnected = action == "answered"
-                        )
+                    when (intent.action) {
+                        Actions.INCOMING_VIDEO_CALL_REJECTED.action,
+                        Actions.INCOMING_VIDEO_CALL_ENDED.action -> {
+                            IncomingVideoCallNotification.cancel(this)
+                            finish()
+                        }
+                        else -> {
+                            VideoCallScreen(
+                                videoCallModel = videoCallModel,
+                                isConnected = intent.action == Actions.INCOMING_VIDEO_CALL_ANSWERED.action
+                            )
+                        }
                     }
                 }
             }
@@ -68,9 +72,9 @@ open class IncomingVideoCallActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        showSystemBars()
-
         super.onDestroy()
+
+        showSystemBars()
     }
 
     private fun hideSystemBars() {

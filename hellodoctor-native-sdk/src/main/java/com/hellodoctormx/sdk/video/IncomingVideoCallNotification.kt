@@ -102,6 +102,14 @@ object IncomingVideoCallNotification {
         notificationManager.cancel(tag, INCOMING_VIDEO_CALL_NOTIFICATION_ID)
     }
 
+    fun reject(context: Context) {
+        cancel(context)
+
+        VideoCallModel.getInstance().apply {
+            roomStatus = "disconnected"
+        }
+    }
+
     private fun isAppInForeground(context: Context): Boolean {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val appProcesses = activityManager.runningAppProcesses ?: return false

@@ -1,8 +1,13 @@
 package com.hellodoctormx.sdk.video.listeners
 
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import com.hellodoctormx.sdk.video.VideoCallController
+import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.IconCompat
+import com.hellodoctormx.sdk.R
+import com.hellodoctormx.sdk.video.*
 import com.twilio.video.RemoteParticipant
 import com.twilio.video.Room
 import com.twilio.video.TwilioException
@@ -10,6 +15,9 @@ import com.twilio.video.TwilioException
 class ActiveRoomListener internal constructor(private val videoCallController: VideoCallController) : Room.Listener {
     override fun onConnected(room: Room) {
         Log.d(TAG, "Connected to " + room.name)
+
+        val videoCallModel = VideoCallModel.getInstance()
+        videoCallModel.roomStatus = "connected"
 
         videoCallController.localAudioController.setSpeakerphoneEnabled(true)
 
@@ -37,6 +45,9 @@ class ActiveRoomListener internal constructor(private val videoCallController: V
 
     override fun onDisconnected(room: Room, twilioException: TwilioException?) {
         Log.d(TAG, "Disconnected from " + room.name + ": " + twilioException)
+
+        val videoCallModel = VideoCallModel.getInstance()
+        videoCallModel.roomStatus = "disconnected"
     }
 
     override fun onParticipantConnected(room: Room, remoteParticipant: RemoteParticipant) {
