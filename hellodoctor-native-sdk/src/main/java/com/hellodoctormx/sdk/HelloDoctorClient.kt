@@ -13,7 +13,7 @@ import com.hellodoctormx.sdk.video.INCOMING_VIDEO_CALL_CHANNEL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-const val DEFAULT_SERVICE_HOST = "https://public-api-pusuheofiq-uc.a.run.app"
+const val DEFAULT_SERVICE_HOST = "https://public-api-3o7jotw3dq-uc.a.run.app"
 
 class HelloDoctorClient {
     companion object {
